@@ -1,4 +1,4 @@
-package fr.uphf.formations.ressources.Entity;
+package fr.uphf.formations.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Formations {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String libelle;
     private String description;
@@ -21,4 +21,6 @@ public class Formations {
     private Formateur formateur;
     @OneToMany
     private List<Participant> participants;
+
+    private Integer prix;
 }

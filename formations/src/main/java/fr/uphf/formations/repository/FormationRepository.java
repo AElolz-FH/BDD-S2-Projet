@@ -1,7 +1,7 @@
-package fr.uphf.formations.ressources.Repository;
+package fr.uphf.formations.repository;
 
 
-import fr.uphf.formations.ressources.Entity.Formations;
+import fr.uphf.formations.entities.Formations;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,17 +1,15 @@
-package fr.uphf.formations.ressources.Entity;
+package fr.uphf.formations.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Formateur {
     @Id
     private String idUtilisateur;

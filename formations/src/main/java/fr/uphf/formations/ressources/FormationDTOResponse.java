@@ -1,4 +1,4 @@
-package fr.uphf.formations.ressources.DTO;
+package fr.uphf.formations.ressources;
 
 
 import lombok.Builder;

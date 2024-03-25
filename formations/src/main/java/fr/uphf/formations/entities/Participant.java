@@ -1,4 +1,4 @@
-package fr.uphf.formations.ressources.Entity;
+package fr.uphf.formations.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
