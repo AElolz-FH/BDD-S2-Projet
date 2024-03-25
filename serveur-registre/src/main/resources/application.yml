@@ -1,7 +1,7 @@
 server:
-  port: 8761 # Port conseillé par Spring pour un serveur Eureka
+  port: 8761 # Port conseillï¿½ par Spring pour un serveur Eureka
 
-# On empêche le serveur de s'enregistrer
+# On empï¿½che le serveur de s'enregistrer
 eureka:
   client:
     register-with-eureka: false
