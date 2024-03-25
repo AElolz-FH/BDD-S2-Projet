@@ -1,0 +1,13 @@
+spring:
+
+  application:
+    name: salles # le nom de notre application
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka #le lien vers le serveur eureka
+
+server:
+  servlet:
+    context-path: /salles
