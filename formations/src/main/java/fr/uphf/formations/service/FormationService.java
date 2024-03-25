@@ -37,6 +37,7 @@ public class FormationService {
         Formations formation = Formations.builder()
                 .libelle(createFormationInputDTO.getLibelle())
                 .description(createFormationInputDTO.getDescription())
+                .prix(createFormationInputDTO.getPrix())
                 .build();
         Formations savedFormation = formationRepository.save(formation);
         // TODO Creer une méthode EntityToCreateFormationResponseDTO()
@@ -59,6 +60,7 @@ public class FormationService {
         return CreateFormationInputDTO.builder()
                 .libelle(formationEntity.getLibelle())
                 .description(formationEntity.getDescription())
+                .prix(formationEntity.getPrix())
                 .build();
     }
 

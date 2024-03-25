@@ -13,29 +13,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@RequestMapping
+
 @RestController
 public class FormationsRessource {
 
     @Autowired
     private FormationService formationService;
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<CreateFormationResponseDTO> postFormations(@RequestBody CreateFormationInputDTO formationDTO) {
         CreateFormationResponseDTO createFormationResponseDTO = this.formationService.createFormation(formationDTO);
         System.out.println("Requête reçue pour créer une formation");
         return ResponseEntity.ok(createFormationResponseDTO);
     }
 
-    @PutMapping("{idFormation}")
+    @PutMapping("/{idFormation}")
     public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
         System.out.println("Requête reçue pour modifier une formation");
         return ResponseEntity.ok(this.formationService.modifyFormation(idFormation, modifyFormationInputDTO));
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<CreateFormationInputDTO>> getAllFormation() {
         List<CreateFormationInputDTO> formations = formationService.getAllFormations();
         return ResponseEntity.ok(formations);
     }
+
 }
