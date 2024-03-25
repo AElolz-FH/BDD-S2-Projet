@@ -1,11 +1,8 @@
 package fr.uphf.formations.ressources.Entity;
 
-import fr.uphf.utilisateurs.ressources.Utilisateur;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
-import java.util.Optional;
 
 
 @Getter
@@ -21,7 +18,7 @@ public class Formations {
     private String libelle;
     private String description;
     @OneToOne
-    private Utilisateur formateur;
+    private Formateur formateur;
     @OneToMany
-    private List<Utilisateur> participants;
+    private List<Participant> participants;
 }

@@ -13,7 +13,5 @@ public class FormationDTO {
     private Integer idFormation;
     private String libelle;
     private String description;
-    private String idFormateur;
-    private LocalDateTime dateCreation;
     private double prix;
 }

@@ -9,9 +9,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="utilisateurs" />
         <module name="paiements" />
-        <module name="cartes" />
-        <module name="cartes (1)" />
+        <module name="seances" />
         <module name="formations" />
+        <module name="salles" />
         <module name="gateway" />
         <module name="serveur-registre" />
         <module name="S2" />
@@ -21,11 +21,11 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="S2" options="-parameters" />
-      <module name="cartes" options="-parameters" />
-      <module name="cartes (1)" options="-parameters" />
       <module name="formations" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="paiements" options="-parameters" />
+      <module name="salles" options="-parameters" />
+      <module name="seances" options="-parameters" />
       <module name="serveur-registre" options="-parameters" />
       <module name="utilisateurs" options="-parameters" />
     </option>

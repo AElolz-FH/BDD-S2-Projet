@@ -1,5 +1,4 @@
 spring:
-
   application:
     name: formations # le nom de notre application
 
