@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>fr.uphf</groupId>
-	<artifactId>cartes</artifactId>
+	<artifactId>salles</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>cartes</name>
+	<name>salles</name>
 	<description>Client du serveur de registre</description>
 	<properties>
 		<java.version>17</java.version>

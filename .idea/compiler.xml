@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="utilisateurs" />
+        <module name="paiements" />
+        <module name="cartes" />
+        <module name="cartes (1)" />
+        <module name="formations" />
+        <module name="gateway" />
+        <module name="serveur-registre" />
+        <module name="S2" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="S2" options="-parameters" />
+      <module name="cartes" options="-parameters" />
+      <module name="cartes (1)" options="-parameters" />
+      <module name="formations" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="paiements" options="-parameters" />
+      <module name="serveur-registre" options="-parameters" />
+      <module name="utilisateurs" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/TP-BDD-S2/S2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/TP-BDD-S2/serveur-registre/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/formations/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/paiements/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/salles/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/seances/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/utilisateurs/src/main/java" charset="UTF-8" />
+  </component>
+</project>
