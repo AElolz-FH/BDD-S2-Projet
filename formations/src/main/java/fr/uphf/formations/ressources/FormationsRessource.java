@@ -40,17 +40,19 @@ public class FormationsRessource {
     public ResponseEntity<Formations> postFormations(@PathVariable String idFormation, @RequestBody FormationDTO formationDTO) {
         System.out.println("Requête reçue pour créer une formation");
         return ResponseEntity.ok(Formations.builder().id(Integer.valueOf(idFormation))
-                .libelle("Formation 1")
-                .description("Description de la formation 1")
+                .libelle(formationDTO.getLibelle())
+                .description(formationDTO.getDescription())
                 .build());
     }
 
-@GetMapping("/modify/{idFormation}")
-    public ResponseEntity<Formations> putFormations(@PathVariable String idFormation, @RequestBody FormationDTO formationDTO) {
+    @PutMapping("/modify/{idFormation}")
+    public ResponseEntity<Formations> putFormations(@PathVariable String idFormation, @RequestBody Formations Formations) {
         System.out.println("Requête reçue pour modifier une formation");
         return ResponseEntity.ok(Formations.builder().id(Integer.valueOf(idFormation))
-                .libelle("Formation 1")
-                .description("Description de la formation 1")
+                .libelle(Formations.getLibelle())
+                .description(Formations.getDescription())
+                .formateur(Formations.getFormateur())
+                .participants(Formations.getParticipants())
                 .build());
     }
 

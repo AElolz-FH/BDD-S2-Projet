@@ -61,6 +61,19 @@ public class FormationService {
         return formation;
     }
 
+    //pour modifier une formation (enregistrer un formateur et une liste de participants)
+    private Formations putFormation(Formations formation) {
+        Formations.builder()
+                .id(formation.getId())
+                .libelle(formation.getLibelle())
+                .description(formation.getDescription())
+                .formateur(formation.getFormateur())
+                .participants(formation.getParticipants())
+                .build();
+        formationRepository.save(formation);
+        return formation;
+    }
+
 
 
 }
