@@ -32,6 +32,18 @@ public class UtilisateurService {
         return listReponse;
     }
 
+    public getUtilisateursResponseDTO getOneUserById(Integer id) {
+        Utilisateur user = this.utilisateurRepository.findById(id);
+        if(user == null){
+            throw new RuntimeException("Aucun utilisateur trouvé");
+        }
+        return getUtilisateursResponseDTO.builder()
+                .nom(user.getNom())
+                .prenom(user.getPrenom())
+                .email(user.getEmail())
+                .build();
+    }
+
     public CreateUtilisateurResponseDTO createUtilisateur(CreateUtilisateurInputDTO createUtilisateurInputDTO) {
         Utilisateur user = Utilisateur.builder()
                 .nom(createUtilisateurInputDTO.getNom())

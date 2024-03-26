@@ -19,6 +19,8 @@ public class UtilisateursRessource {
 
     @Autowired
     private UtilisateurService utilisateurService;
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
     @PostMapping("/")
     public ResponseEntity<CreateUtilisateurResponseDTO> postUtilisateur(@RequestBody CreateUtilisateurInputDTO createUtilisateurInputDTO){
@@ -30,4 +32,11 @@ public class UtilisateursRessource {
         List<getUtilisateursResponseDTO> getUtilisateursResponseDTO = this.utilisateurService.getUtilisateur();
         return ResponseEntity.ok(getUtilisateursResponseDTO);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<getUtilisateursResponseDTO> getOneUserById(@PathVariable Integer id){
+        System.out.println("Requête reçue pour l'utilisateur avec l'id : " + id);
+        return ResponseEntity.ok(this.utilisateurService.getOneUserById(id));
+    }
+
 }
