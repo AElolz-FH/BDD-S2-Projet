@@ -2,7 +2,9 @@ package fr.uphf.formations.services;
 
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
+import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
 import fr.uphf.formations.entities.Salles;
+import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,20 @@ public class SalleService {
                 .batiment(salleBase.getBatiment())
                 .build();
 
+
+    }
+
+    public getSalleDTOidOutput getSalleById(Integer id) throws SalleNotFoundException {
+        //si la salle n'est pas dans la base alors throw une exception salle non trouvée
+        Salles salle = this.salleRepository.findById(id).orElseThrow(() -> new RuntimeException("Salles not found"));
+        //sinon on retourne un dto en prenant les attributs de la salle
+        return getSalleDTOidOutput.builder()
+                .id(salle.getId())
+                .numeroSalle(salle.getNumeroSalle())
+                .capacite(salle.getCapacite())
+                .batiment(salle.getBatiment())
+                .isDisponible(salle.isDisponible())
+                .build();
 
     }
 }

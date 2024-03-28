@@ -2,6 +2,8 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
+import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
+import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.services.SalleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,13 @@ public class SalleRessource {
         creationSalleDTOOutput createSalleResponseDTO = this.salleService.createSalle(salleDTO);
         System.out.println("Requête reçue pour créer une salle");
         return ResponseEntity.ok(createSalleResponseDTO);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<getSalleDTOidOutput> getSalleById(@PathVariable Integer id) throws SalleNotFoundException {
+        getSalleDTOidOutput getSalleByIdResponseDTO = this.salleService.getSalleById(id);
+        System.out.println("Requête reçue pour obtenir une salle");
+        return ResponseEntity.ok(getSalleByIdResponseDTO);
     }
 
 }
