@@ -2,7 +2,6 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
-import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationInputDTO;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.FormationService;
