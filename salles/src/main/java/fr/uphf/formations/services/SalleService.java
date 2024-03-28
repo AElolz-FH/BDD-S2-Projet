@@ -40,6 +40,7 @@ public class SalleService {
                 .isDisponible(salleDTO.isDisponible())
                 .batiment(salleDTO.getBatiment())
                 .build();
+
         salleRepository.save(salleBase);
 
         return creationSalleDTOOutput.builder()
@@ -82,6 +83,8 @@ public class SalleService {
             throw new RuntimeException("Salle not found");
         }
 
+        Salles temp = salle;
+
         Salles salleModifiee = Salles.builder()
                 .numeroSalle(salleDTO.getNumeroSalle())
                 .nomSalle(salleDTO.getNomSalle())
@@ -89,11 +92,16 @@ public class SalleService {
                 .batiment(salleDTO.getBatiment())
                 .build();
 
-
-        Integer capacite = salle.getCapacite();
-        salleModifiee.setCapacite(capacite);
-
         this.salleRepository.delete(salle);
+
+        salleModifiee.setId(temp.getId());
+        salleModifiee.setCapacite(salleDTO.getCapacite());
+        salleModifiee.setNomSalle(salleDTO.getNomSalle());
+        salleModifiee.setNumeroSalle(salleDTO.getNumeroSalle());
+        salleModifiee.setBatiment(salleDTO.getBatiment());
+        salleModifiee.setDisponible(temp.isDisponible());
+
+
         this.salleRepository.save(salleModifiee);
 
         return modifierSalleDTOOutput.builder()
@@ -104,9 +112,10 @@ public class SalleService {
                 .build();
     }
 
-    // TODO résoudre le pb de la modification de la disponibilité
+
     public modifierSalleDispoDTOOutput modifierDispoSalle(modiferSalleDispoDTOInput modifierSalleDTOInput) {
         Salles salle = this.salleRepository.findByNumeroSalle(modifierSalleDTOInput.getNumeroSalle());
+
         if (salle == null) {
             throw new RuntimeException("Salle not found");
         }
@@ -116,7 +125,7 @@ public class SalleService {
 
         return modifierSalleDispoDTOOutput.builder()
                 .numeroSalle(salle.getNumeroSalle())
-                .isDisponible(modifierSalleDTOInput.isDisponible())
+                .isDisponible(salle.isDisponible())
                 .build();
     }
 
