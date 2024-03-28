@@ -3,11 +3,14 @@ package fr.uphf.formations.services;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
+import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
+import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
 import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.repositories.SeanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -62,7 +65,28 @@ public class SeanceService {
                 .build();
     }
 
+    public putSeanceOutputDTO putSeanceById(Integer id, putSeanceInputDTO putSeanceInputDTO)
+    {
+        Seance seance = this.seanceRepository.findById(id).orElseThrow();
 
+        seance.setDate(LocalDateTime.parse(putSeanceInputDTO.getDate()));
+        seance.setDuree(putSeanceInputDTO.getDuree());
+        seance.setBatiment(putSeanceInputDTO.getBatiment());
+        seance.setNumeroSalle(putSeanceInputDTO.getNumeroSalle());
+
+        this.seanceRepository.save(seance);
+
+        return putSeanceOutputDTO.builder()
+                .id(seance.getId())
+                .date(seance.getDate().toString())
+                .duree(seance.getDuree())
+                .batiment(seance.getBatiment())
+                .numeroSalle(seance.getNumeroSalle())
+                .nomFormation(seance.getNomFormation())
+                .nomFormateur(seance.getNomFormateur())
+                .build();
+
+    }
 
 
 }

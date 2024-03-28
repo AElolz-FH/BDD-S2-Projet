@@ -4,6 +4,8 @@ package fr.uphf.formations.ressources;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
+import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
+import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
 import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.services.SeanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +38,11 @@ public class SeanceRessource {
         return ResponseEntity.ok(this.seanceService.getSeanceById(id));
     }
 
+
+    @PutMapping("/{id}")
+    public ResponseEntity<putSeanceOutputDTO> putSeanceById(@PathVariable Integer id, @RequestBody putSeanceInputDTO seanceDTO) {
+        System.out.println("Requête reçue pour modifier la séance avec l'id : " + id + " ...");
+        return ResponseEntity.ok(this.seanceService.putSeanceById(id, seanceDTO));
+    }
 
 }
