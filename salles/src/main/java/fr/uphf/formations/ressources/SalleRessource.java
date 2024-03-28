@@ -2,6 +2,7 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
+import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
 import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
@@ -60,6 +61,13 @@ public class SalleRessource {
         getSalleDTOidOutput getSalleByIdResponseDTO = this.salleService.getSalleById(id);
         System.out.println("Requête reçue pour obtenir une salle");
         return ResponseEntity.ok(getSalleByIdResponseDTO);
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<getAllSallesDTOOutput> getAllSalles() {
+        getAllSallesDTOOutput getAllSallesResponseDTO = this.salleService.getAllSalles();
+        System.out.println("Requête reçue pour obtenir toutes les salles");
+        return ResponseEntity.ok(getAllSallesResponseDTO);
     }
 
 }
