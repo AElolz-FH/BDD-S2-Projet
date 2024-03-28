@@ -6,6 +6,8 @@ import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
 import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOInput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
+import fr.uphf.formations.dto.modifierSalleDispoDTO.modiferSalleDispoDTOInput;
+import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
 import fr.uphf.formations.entities.Salles;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
@@ -101,4 +103,21 @@ public class SalleService {
                 .batiment(salleDTO.getBatiment())
                 .build();
     }
+
+    // TODO résoudre le pb de la modification de la disponibilité
+    public modifierSalleDispoDTOOutput modifierDispoSalle(modiferSalleDispoDTOInput modifierSalleDTOInput) {
+        Salles salle = this.salleRepository.findByNumeroSalle(modifierSalleDTOInput.getNumeroSalle());
+        if (salle == null) {
+            throw new RuntimeException("Salle not found");
+        }
+
+        salle.setDisponible(modifierSalleDTOInput.isDisponible());
+        this.salleRepository.save(salle);
+
+        return modifierSalleDispoDTOOutput.builder()
+                .numeroSalle(salle.getNumeroSalle())
+                .isDisponible(modifierSalleDTOInput.isDisponible())
+                .build();
+    }
+
 }
