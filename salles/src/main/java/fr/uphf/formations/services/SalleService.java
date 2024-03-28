@@ -4,12 +4,15 @@ import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
 import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
+import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOInput;
+import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
 import fr.uphf.formations.entities.Salles;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +26,11 @@ public class SalleService {
     }
 
     public creationSalleDTOOutput createSalle(creationSalleDTOInput salleDTO) {
-
+        List<Salles> salles = this.salleRepository.findAll();
+        if(salles.stream().anyMatch(salle -> salle.getNumeroSalle().equals(salleDTO.getNumeroSalle()))){
+            System.out.println("Salle already exists");
+            throw new RuntimeException("Salle already exists");
+        }
         Salles salleBase = Salles.builder()
                 .numeroSalle(salleDTO.getNumeroSalle())
                 .nomSalle(salleDTO.getNomSalle())
@@ -39,8 +46,6 @@ public class SalleService {
                 .capacite(salleBase.getCapacite())
                 .batiment(salleBase.getBatiment())
                 .build();
-
-
     }
 
     public getSalleDTOidOutput getSalleById(Integer id) throws SalleNotFoundException {
@@ -66,6 +71,34 @@ public class SalleService {
                         .batiment(salle.getBatiment())
                         .isDisponible(salle.isDisponible())
                         .build()).collect(Collectors.toList()))
+                .build();
+    }
+
+    public modifierSalleDTOOutput modifierSalle(modifierSalleDTOInput salleDTO) {
+        Salles salle = this.salleRepository.findByNumeroSalle(salleDTO.getNumeroSalle());
+        if (salle == null) {
+            throw new RuntimeException("Salle not found");
+        }
+
+        Salles salleModifiee = Salles.builder()
+                .numeroSalle(salleDTO.getNumeroSalle())
+                .nomSalle(salleDTO.getNomSalle())
+                .capacite(salleDTO.getCapacite())
+                .batiment(salleDTO.getBatiment())
+                .build();
+
+
+        Integer capacite = salle.getCapacite();
+        salleModifiee.setCapacite(capacite);
+
+        this.salleRepository.delete(salle);
+        this.salleRepository.save(salleModifiee);
+
+        return modifierSalleDTOOutput.builder()
+                .numeroSalle(salleModifiee.getNumeroSalle())
+                .nomSalle(salleModifiee.getNomSalle())
+                .capacite(salleModifiee.getCapacite())
+                .batiment(salleDTO.getBatiment())
                 .build();
     }
 }

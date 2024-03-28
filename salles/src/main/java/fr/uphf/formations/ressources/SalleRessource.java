@@ -4,6 +4,8 @@ import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
 import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
+import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOInput;
+import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.services.SalleService;
@@ -68,6 +70,13 @@ public class SalleRessource {
         getAllSallesDTOOutput getAllSallesResponseDTO = this.salleService.getAllSalles();
         System.out.println("Requête reçue pour obtenir toutes les salles");
         return ResponseEntity.ok(getAllSallesResponseDTO);
+    }
+
+    @PutMapping("/{numeroSalle}")
+    public ResponseEntity<modifierSalleDTOOutput> modifierSalles(@RequestBody modifierSalleDTOInput salleDTO) {
+        modifierSalleDTOOutput modifierSalleResponseDTO = this.salleService.modifierSalle(salleDTO);
+        System.out.println("Requête reçue pour modifier une salle");
+        return ResponseEntity.ok(modifierSalleResponseDTO);
     }
 
 }
