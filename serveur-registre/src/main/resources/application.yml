@@ -1,0 +1,10 @@
+server:
+  port: 8761 # Port conseill� par Spring pour un serveur Eureka
+
+# On emp�che le serveur de s'enregistrer
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+

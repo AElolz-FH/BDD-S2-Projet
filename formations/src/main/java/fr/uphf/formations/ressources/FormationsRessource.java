@@ -1,39 +1,42 @@
 package fr.uphf.formations.ressources;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
+import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
+import fr.uphf.formations.entities.Formations;
+import fr.uphf.formations.ressources.modification.dto.ModifyFormationInputDTO;
+import fr.uphf.formations.ressources.modification.dto.ModifyFormationOutputDTO;
+import fr.uphf.formations.service.FormationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Arrays;
 
 
-@RequestMapping()
+
 @RestController
 public class FormationsRessource {
 
-    @Builder
-    @Getter
-    @Setter
-    public static class FormationsItemListDTO {
-        private String idFormation;
-        private String idFormateur;
-        private LocalDateTime dateCreation;
-        private List<Integer> idSalles;
-        private List<Integer> idParticipants;
+    @Autowired
+    private FormationService formationService;
+
+    @PostMapping("/")
+    public ResponseEntity<CreateFormationResponseDTO> postFormations(@RequestBody CreateFormationInputDTO formationDTO) {
+        CreateFormationResponseDTO createFormationResponseDTO = this.formationService.createFormation(formationDTO);
+        System.out.println("Requête reçue pour créer une formation");
+        return ResponseEntity.ok(createFormationResponseDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<List<FormationsItemListDTO>> getCartes() {
-        System.out.println("Requête reçue pour lister des formations");
-        return ResponseEntity.ok(Arrays.asList(
-                FormationsItemListDTO.builder().idFormation("1").dateCreation(LocalDateTime.now()).build(),
-                FormationsItemListDTO.builder().idFormation("2").dateCreation(LocalDateTime.now()).build()
-        ));
+    @PutMapping("/{idFormation}")
+    public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
+        System.out.println("Requête reçue pour modifier une formation");
+        return ResponseEntity.ok(this.formationService.modifyFormation(idFormation, modifyFormationInputDTO));
     }
+
+    @GetMapping("/")
+    public ResponseEntity<List<CreateFormationInputDTO>> getAllFormation() {
+        List<CreateFormationInputDTO> formations = formationService.getAllFormations();
+        return ResponseEntity.ok(formations);
+    }
+
 }

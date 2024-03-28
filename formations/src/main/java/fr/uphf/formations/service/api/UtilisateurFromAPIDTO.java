@@ -1,21 +1,16 @@
-package fr.uphf.utilisateurs.ressources;
+package fr.uphf.formations.service.api;
 
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Builder
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Utilisateur {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+@Builder
+public class UtilisateurFromAPIDTO {
+    private String id;
     private boolean formateur;
     private LocalDateTime dateCreation;
     private String nom;
