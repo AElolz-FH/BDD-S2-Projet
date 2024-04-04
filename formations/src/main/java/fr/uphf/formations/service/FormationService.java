@@ -23,8 +23,10 @@ public class FormationService {
 
     @Autowired
     private WebClient.Builder webClient;
-    public FormationService(FormationRepository formationRepository) {
+
+    public FormationService(FormationRepository formationRepository, WebClient.Builder webClientBuilder) {
         this.formationRepository = formationRepository;
+        this.webClient = webClientBuilder;
     }
 
     public List<CreateFormationInputDTO> getAllFormations() {
@@ -89,7 +91,7 @@ public class FormationService {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         // Verifier que le formateur existe à partir de l'id formateur fournit en entrée de la méthode en appelant l'API sur utilisateur
         // Si le formateur n'existe pas, on renvoie une erreur
-        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://utilisateurs/")
+        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost/utilisateurs/")
                 .build()
                 .get()
                 .uri("/" + modifyFormationInputDTO.getIdFormateur())
