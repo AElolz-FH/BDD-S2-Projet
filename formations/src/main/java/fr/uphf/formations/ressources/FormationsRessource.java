@@ -2,7 +2,6 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
-import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationInputDTO;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.FormationService;
@@ -29,13 +28,15 @@ public class FormationsRessource {
 
     @PutMapping("/{idFormation}")
     public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
-        System.out.println("Requête reçue pour modifier une formation");
+        System.out.println("Requête reçue pour modifier une formation avec l'ID : " + idFormation);
         return ResponseEntity.ok(this.formationService.modifyFormation(idFormation, modifyFormationInputDTO));
     }
+
 
     @GetMapping("/")
     public ResponseEntity<List<CreateFormationInputDTO>> getAllFormation() {
         List<CreateFormationInputDTO> formations = formationService.getAllFormations();
+        System.out.println("Requête reçue pour récupérer les formations");
         return ResponseEntity.ok(formations);
     }
 
