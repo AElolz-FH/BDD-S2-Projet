@@ -2,12 +2,14 @@ package fr.uphf.utilisateurs.service;
 
 import fr.uphf.utilisateurs.dto.create.CreateUtilisateurInputDTO;
 import fr.uphf.utilisateurs.dto.create.CreateUtilisateurResponseDTO;
-import fr.uphf.utilisateurs.dto.getall.getUtilisateursInputDTO;
 import fr.uphf.utilisateurs.dto.getall.getUtilisateursResponseDTO;
+import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOInput;
+import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOOutput;
 import fr.uphf.utilisateurs.repositories.UtilisateurRepository;
 import fr.uphf.utilisateurs.ressources.Utilisateur;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,18 @@ public class UtilisateurService {
         return CreateUtilisateurResponseDTO.builder()
                 .nom(user.getNom())
                 .prenom(user.getPrenom())
+                .build();
+    }
+
+    @Transactional
+    public putUtilisateurDTOOutput modifyUtilisateur(Integer id, putUtilisateurDTOInput putUtilisateurDTOInput) {
+        Utilisateur user = this.utilisateurRepository.findById(putUtilisateurDTOInput.getId());
+        if(user == null){ throw new RuntimeException("Aucun utilisateur trouvé"); }
+        user.setFormateur(putUtilisateurDTOInput.isFormateur());
+        this.utilisateurRepository.save(user);
+        return putUtilisateurDTOOutput.builder()
+                .id(user.getId())
+                .Formateur(user.isFormateur())
                 .build();
     }
 }

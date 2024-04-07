@@ -1,7 +1,6 @@
 spring:
   application:
-    name: utilisateurs # le nom de notre application
-
+    name: utilisateurs
   datasource:
     url: jdbc:h2:mem:utilisateurs
     username: root
