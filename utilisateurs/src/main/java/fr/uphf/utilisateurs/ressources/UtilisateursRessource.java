@@ -8,6 +8,7 @@ import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOInput;
 import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOOutput;
 import fr.uphf.utilisateurs.repositories.UtilisateurRepository;
 import fr.uphf.utilisateurs.service.UtilisateurService;
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,13 @@ public class UtilisateursRessource {
         System.out.println("Requête reçue pour modifier l'utilisateur avec l'id : " + id);
         putUtilisateurDTOOutput putUtilisateurDTOOutput = this.utilisateurService.modifyUtilisateur(id, putUtilisateurDTOInput);
         return ResponseEntity.ok(putUtilisateurDTOOutput);
+    }
+
+    @DeleteMapping("/nom={nom}&prenom={prenom}")
+    public ResponseEntity<String> deleteUtilisateur(@PathVariable String nom, @PathVariable String prenom){
+        System.out.println("Requête reçue pour supprimer l'utilisateur avec le nom : " + nom + " et le prénom : " + prenom);
+        this.utilisateurService.deleteUser(nom, prenom);
+        return ResponseEntity.ok("Utilisateur supprimé");
     }
 
 }
