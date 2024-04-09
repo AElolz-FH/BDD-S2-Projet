@@ -107,5 +107,10 @@ public class SeanceService {
         return seancesDTO;
     }
 
+    public String deleteSeanceById(Integer id) {
+        Seance s = this.seanceRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("La séance avec l'id " + id + " n'existe pas"));
+        this.seanceRepository.delete(s);
+        return "La séance avec l'id " + id + " a été supprimée";
+    }
 
 }

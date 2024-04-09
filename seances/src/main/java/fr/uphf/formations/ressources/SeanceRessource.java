@@ -53,4 +53,10 @@ public class SeanceRessource {
         return ResponseEntity.ok(this.seanceService.putSeanceById(id, seanceDTO));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSeanceById(@PathVariable Integer id) {
+        System.out.println("Requête reçue pour supprimer la séance avec l'id : " + id + " ...");
+        return ResponseEntity.ok(this.seanceService.deleteSeanceById(id));
+    }
+
 }
