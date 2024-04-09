@@ -131,4 +131,10 @@ public class FormationService {
                         .build())
                 .build();
     }
+
+    public String deleteFormation(String idFormation) {
+        Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
+        formationRepository.delete(formation);
+        return "Formation supprimée";
+    }
 }
