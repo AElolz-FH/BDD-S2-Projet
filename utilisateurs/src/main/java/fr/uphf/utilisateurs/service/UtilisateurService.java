@@ -7,6 +7,8 @@ import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOInput;
 import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOOutput;
 import fr.uphf.utilisateurs.repositories.UtilisateurRepository;
 import fr.uphf.utilisateurs.ressources.Utilisateur;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,9 +42,11 @@ public class UtilisateurService {
             throw new RuntimeException("Aucun utilisateur trouvé");
         }
         return getUtilisateursResponseDTO.builder()
+                .id(user.getId())
                 .nom(user.getNom())
                 .prenom(user.getPrenom())
                 .email(user.getEmail())
+                .Formateur(user.isFormateur())
                 .build();
     }
 
@@ -59,12 +63,23 @@ public class UtilisateurService {
                 .build();
     }
 
+    /*
+    @PersistenceContext
+    private EntityManager entityManager;
+
+     */
+
     @Transactional
     public putUtilisateurDTOOutput modifyUtilisateur(Integer id, putUtilisateurDTOInput putUtilisateurDTOInput) {
         Utilisateur user = this.utilisateurRepository.findById(putUtilisateurDTOInput.getId());
         if(user == null){ throw new RuntimeException("Aucun utilisateur trouvé"); }
         user.setFormateur(putUtilisateurDTOInput.isFormateur());
         this.utilisateurRepository.save(user);
+        /*
+        this.entityManager.flush();
+        this.entityManager.refresh(user);
+
+         */
         return putUtilisateurDTOOutput.builder()
                 .id(user.getId())
                 .Formateur(user.isFormateur())
