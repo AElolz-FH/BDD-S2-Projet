@@ -1,5 +1,6 @@
 package fr.uphf.formations.service.api;
 
+import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UtilisateurFromAPIDTO {
-    private String id;
+    private Integer id;
     private boolean formateur;
     private LocalDateTime dateCreation;
     private String nom;

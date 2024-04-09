@@ -8,7 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class getUtilisateursResponseDTO {
+    private Integer id;
     private String nom;
     private String prenom;
     private String email;
+    private boolean Formateur;
 }
