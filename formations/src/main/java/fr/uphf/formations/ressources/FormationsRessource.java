@@ -40,4 +40,10 @@ public class FormationsRessource {
         return ResponseEntity.ok(formations);
     }
 
+    @DeleteMapping("/{idFormation}")
+    public ResponseEntity<String> deleteFormation(@PathVariable String idFormation) {
+        System.out.println("Requête reçue pour supprimer une formation avec l'ID : " + idFormation);
+        return ResponseEntity.ok(this.formationService.deleteFormation(idFormation));
+    }
+
 }

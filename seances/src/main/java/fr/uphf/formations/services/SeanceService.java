@@ -2,6 +2,7 @@ package fr.uphf.formations.services;
 
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
+import fr.uphf.formations.dto.getAllSeancesDTO.getAllSeancesDTOOutput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -86,6 +88,23 @@ public class SeanceService {
                 .nomFormateur(seance.getNomFormateur())
                 .build();
 
+    }
+
+    public List<getAllSeancesDTOOutput> getAllSeances() {
+        List<Seance> seances = this.seanceRepository.findAll();
+        List<getAllSeancesDTOOutput> seancesDTO = new ArrayList<>();
+        for (Seance seance : seances) {
+            seancesDTO.add(getAllSeancesDTOOutput.builder()
+                    .id(seance.getId())
+                    .date(seance.getDate().toString())
+                    .duree(seance.getDuree())
+                    .batiment(seance.getBatiment())
+                    .numeroSalle(seance.getNumeroSalle())
+                    .nomFormation(seance.getNomFormation())
+                    .nomFormateur(seance.getNomFormateur())
+                    .build());
+        }
+        return seancesDTO;
     }
 
 
