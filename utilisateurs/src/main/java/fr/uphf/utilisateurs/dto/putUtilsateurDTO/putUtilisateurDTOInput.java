@@ -1,16 +1,16 @@
-package fr.uphf.utilisateurs.dto.getall;
+package fr.uphf.utilisateurs.dto.putUtilsateurDTO;
+
 
 import lombok.*;
 
-@Builder
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class getUtilisateursResponseDTO {
+public class putUtilisateurDTOInput {
     private Integer id;
     private String nom;
     private String prenom;
-    private String email;
     private boolean Formateur;
 }

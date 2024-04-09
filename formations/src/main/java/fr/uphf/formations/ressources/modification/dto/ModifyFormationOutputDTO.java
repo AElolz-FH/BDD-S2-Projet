@@ -19,7 +19,7 @@ public class ModifyFormationOutputDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ModifyFormateurPayload {
-        private String id;
+        private Integer id;
         private boolean formateur;
         private String nom;
         private String email;
