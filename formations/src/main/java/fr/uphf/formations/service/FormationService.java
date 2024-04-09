@@ -1,5 +1,6 @@
 package fr.uphf.formations.service;
 import fr.uphf.formations.entities.Formateur;
+import fr.uphf.formations.repository.FormateurRepository;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
 import fr.uphf.formations.ressources.FormationDTOResponse;
@@ -20,7 +21,8 @@ import java.util.stream.Collectors;
 public class FormationService {
     @Autowired
     private final FormationRepository formationRepository;
-
+    @Autowired
+    private FormateurRepository formateurRepository;
     @Autowired
     private WebClient.Builder webClient;
 
@@ -42,7 +44,6 @@ public class FormationService {
                 .prix(createFormationInputDTO.getPrix())
                 .build();
         Formations savedFormation = formationRepository.save(formation);
-        // TODO Creer une méthode EntityToCreateFormationResponseDTO()
         return EntityToCreateFormationResponseDTO(String.valueOf(savedFormation.getId()));
     }
 
@@ -91,7 +92,7 @@ public class FormationService {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         // Verifier que le formateur existe à partir de l'id formateur fournit en entrée de la méthode en appelant l'API sur utilisateur
         // Si le formateur n'existe pas, on renvoie une erreur
-        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost/utilisateurs/")
+        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost:9000/utilisateurs/")
                 .build()
                 .get()
                 .uri("/" + modifyFormationInputDTO.getIdFormateur())
@@ -103,7 +104,7 @@ public class FormationService {
         if(formateur == null) {
             throw new RuntimeException("Formateur non trouvé");
         }
-        if(!formateur.isFormateur()) {
+        if(formateur.isFormateur() != true) {
             throw new RuntimeException("L'utilisateur n'est pas un formateur");
         }
 
@@ -113,6 +114,7 @@ public class FormationService {
                 .prenom(formateur.getPrenom())
                 .idUtilisateur(formateur.getId())
                 .build();
+        this.formateurRepository.save(toSave);
         formation.setFormateur(toSave);
 
         this.formationRepository.save(formation);
@@ -128,5 +130,11 @@ public class FormationService {
                         .formateur(formateur.isFormateur())
                         .build())
                 .build();
+    }
+
+    public String deleteFormation(String idFormation) {
+        Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
+        formationRepository.delete(formation);
+        return "Formation supprimée";
     }
 }

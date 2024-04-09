@@ -28,14 +28,22 @@ public class FormationsRessource {
 
     @PutMapping("/{idFormation}")
     public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
-        System.out.println("Requête reçue pour modifier une formation");
+        System.out.println("Requête reçue pour modifier une formation avec l'ID : " + idFormation);
         return ResponseEntity.ok(this.formationService.modifyFormation(idFormation, modifyFormationInputDTO));
     }
+
 
     @GetMapping("/")
     public ResponseEntity<List<CreateFormationInputDTO>> getAllFormation() {
         List<CreateFormationInputDTO> formations = formationService.getAllFormations();
+        System.out.println("Requête reçue pour récupérer les formations");
         return ResponseEntity.ok(formations);
+    }
+
+    @DeleteMapping("/{idFormation}")
+    public ResponseEntity<String> deleteFormation(@PathVariable String idFormation) {
+        System.out.println("Requête reçue pour supprimer une formation avec l'ID : " + idFormation);
+        return ResponseEntity.ok(this.formationService.deleteFormation(idFormation));
     }
 
 }

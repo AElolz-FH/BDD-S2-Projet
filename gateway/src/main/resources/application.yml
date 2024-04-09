@@ -4,23 +4,55 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: paiements-id
-          uri: lb://paiements
-          predicates:
-            - Path=/paiements/**
         - id: seances-id
           uri: lb://seances
           predicates:
             - Path=/seances/**
+          metadata:
+            cors:
+              allowedOrigins: '*'
+              allowedMethods:
+                - GET
+                - POST
+                - PUT
+              allowedHeaders: '*'
+              maxAge: 30
         - id: utilisateurs-id
           uri: lb://utilisateurs
           predicates:
             - Path=/utilisateurs/**
+          metadata:
+            cors:
+              allowedOrigins: '*'
+              allowedMethods:
+                - GET
+                - POST
+                - PUT
+              allowedHeaders: '*'
+              maxAge: 30
         - id : salles-id
           uri : lb://salles
           predicates:
             - Path=/salles/**
+          metadata:
+            cors:
+              allowedOrigins: '*'
+              allowedMethods:
+                - GET
+                - POST
+                - PUT
+              allowedHeaders: '*'
+              maxAge: 30
         - id: formations-id
           uri: lb://formations
           predicates:
             - Path=/formations/**
+          metadata:
+            cors:
+              allowedOrigins: '*'
+              allowedMethods:
+                - GET
+                - POST
+                - PUT
+              allowedHeaders: '*'
+              maxAge: 30
