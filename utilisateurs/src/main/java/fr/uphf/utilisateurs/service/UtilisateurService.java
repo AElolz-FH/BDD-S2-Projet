@@ -85,4 +85,13 @@ public class UtilisateurService {
                 .Formateur(user.isFormateur())
                 .build();
     }
+
+    public String deleteUser(String nom,String prenom) {
+        Utilisateur user = this.utilisateurRepository.findByNomAndPrenom(nom, prenom);
+        if(user == null){
+            throw new RuntimeException("Aucun utilisateur trouvé");
+        }
+        this.utilisateurRepository.delete(user);
+        return "Utilisateur supprimé";
+    }
 }
