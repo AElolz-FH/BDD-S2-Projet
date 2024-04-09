@@ -3,6 +3,8 @@ package fr.uphf.formations.services;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
+import fr.uphf.formations.dto.getSalleByNumAndBatDTO.getSalleByNumAndBatDTOOutput;
+import fr.uphf.formations.dto.getSalleByNumeroDTO.getSalleByNumeroDTOOutput;
 import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOInput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
@@ -13,6 +15,7 @@ import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -127,6 +130,43 @@ public class SalleService {
                 .numeroSalle(salle.getNumeroSalle())
                 .isDisponible(salle.isDisponible())
                 .build();
+    }
+
+    public getSalleByNumeroDTOOutput getSalleByNumero(@RequestParam(required = true) Integer numeroSalle){
+        Salles salle = this.salleRepository.findByNumeroSalle(numeroSalle);
+        if(salle == null){
+            throw new RuntimeException("Salle not found");
+        }
+        return getSalleByNumeroDTOOutput.builder()
+                .numeroSalle(String.valueOf(salle.getNumeroSalle()))
+                .nomSalle(salle.getNomSalle())
+                .capacite(salle.getCapacite())
+                .batiment(salle.getBatiment())
+                .isDisponible(salle.isDisponible())
+                .build();
+    }
+
+    public getSalleByNumAndBatDTOOutput getSalleByNumeroAndBat(Integer numeroSalle,String batiment){
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
+        if(salle == null){
+            throw new RuntimeException("Salle not found");
+        }
+        return getSalleByNumAndBatDTOOutput.builder()
+                .numeroSalle(String.valueOf(salle.getNumeroSalle()))
+                .nomSalle(salle.getNomSalle())
+                .capacite(salle.getCapacite())
+                .batiment(salle.getBatiment())
+                .isDisponible(salle.isDisponible())
+                .build();
+    }
+
+    public String deleteSalle(Integer numeroSalle, String batiment) {
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
+        if(salle == null){
+            throw new RuntimeException("Salle not found");
+        }
+        this.salleRepository.delete(salle);
+        return "La salle : " + salle.getNomSalle() + " a été supprimée";
     }
 
 }
