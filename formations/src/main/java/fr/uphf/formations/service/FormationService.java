@@ -44,7 +44,6 @@ public class FormationService {
                 .prix(createFormationInputDTO.getPrix())
                 .build();
         Formations savedFormation = formationRepository.save(formation);
-        // TODO Creer une méthode EntityToCreateFormationResponseDTO()
         return EntityToCreateFormationResponseDTO(String.valueOf(savedFormation.getId()));
     }
 
@@ -93,7 +92,7 @@ public class FormationService {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         // Verifier que le formateur existe à partir de l'id formateur fournit en entrée de la méthode en appelant l'API sur utilisateur
         // Si le formateur n'existe pas, on renvoie une erreur
-        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost:9000/utilisateurs")
+        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost:9000/utilisateurs/")
                 .build()
                 .get()
                 .uri("/" + modifyFormationInputDTO.getIdFormateur())
@@ -105,7 +104,7 @@ public class FormationService {
         if(formateur == null) {
             throw new RuntimeException("Formateur non trouvé");
         }
-        if(!formateur.isFormateur()) {
+        if(formateur.isFormateur() != true) {
             throw new RuntimeException("L'utilisateur n'est pas un formateur");
         }
 

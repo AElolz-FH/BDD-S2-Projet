@@ -8,6 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModifyFormationInputDTO {
-    private String idFormateur;
-    private String idUtilisateurs;
+    private Integer idFormateur;
 }
