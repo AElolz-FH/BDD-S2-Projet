@@ -15,6 +15,7 @@ spring:
                 - GET
                 - POST
                 - PUT
+                - DELETE
               allowedHeaders: '*'
               maxAge: 30
         - id: utilisateurs-id
@@ -28,6 +29,7 @@ spring:
                 - GET
                 - POST
                 - PUT
+                - DELETE
               allowedHeaders: '*'
               maxAge: 30
         - id : salles-id
@@ -41,6 +43,7 @@ spring:
                 - GET
                 - POST
                 - PUT
+                - DELETE
               allowedHeaders: '*'
               maxAge: 30
         - id: formations-id
@@ -54,5 +57,6 @@ spring:
                 - GET
                 - POST
                 - PUT
+                - DELETE
               allowedHeaders: '*'
               maxAge: 30
