@@ -28,6 +28,7 @@ public class UtilisateurService {
         List<getUtilisateursResponseDTO> listReponse = new ArrayList<>();
         for (Utilisateur user : users) {
             listReponse.add(getUtilisateursResponseDTO.builder()
+                    .id(user.getId())
                     .nom(user.getNom())
                     .prenom(user.getPrenom())
                     .email(user.getEmail())
@@ -52,6 +53,7 @@ public class UtilisateurService {
 
     public CreateUtilisateurResponseDTO createUtilisateur(CreateUtilisateurInputDTO createUtilisateurInputDTO) {
         Utilisateur user = Utilisateur.builder()
+                .id(createUtilisateurInputDTO.getId())
                 .nom(createUtilisateurInputDTO.getNom())
                 .prenom(createUtilisateurInputDTO.getPrenom())
                 .email(createUtilisateurInputDTO.getEmail())
