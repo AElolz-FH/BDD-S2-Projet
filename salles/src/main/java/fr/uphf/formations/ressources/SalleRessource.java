@@ -83,7 +83,6 @@ public class SalleRessource {
         return ResponseEntity.ok(getSalleByNumAndBatDTOOutput);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("")
     public ResponseEntity<getAllSallesDTOOutput> getAllSalles() {
         getAllSallesDTOOutput getAllSallesResponseDTO = this.salleService.getAllSalles();
