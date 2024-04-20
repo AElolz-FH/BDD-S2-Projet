@@ -32,10 +32,12 @@ public class UtilisateurService {
                     .nom(user.getNom())
                     .prenom(user.getPrenom())
                     .email(user.getEmail())
+                    .Formateur(user.isFormateur())
                     .build());
         }
         return listReponse;
     }
+
 
     public getUtilisateursResponseDTO getOneUserById(Integer id) {
         Utilisateur user = this.utilisateurRepository.findById(id);
@@ -53,7 +55,6 @@ public class UtilisateurService {
 
     public CreateUtilisateurResponseDTO createUtilisateur(CreateUtilisateurInputDTO createUtilisateurInputDTO) {
         Utilisateur user = Utilisateur.builder()
-                .id(createUtilisateurInputDTO.getId())
                 .nom(createUtilisateurInputDTO.getNom())
                 .prenom(createUtilisateurInputDTO.getPrenom())
                 .email(createUtilisateurInputDTO.getEmail())

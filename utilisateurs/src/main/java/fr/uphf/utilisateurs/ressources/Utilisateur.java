@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Utilisateur {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private boolean formateur;
     private LocalDateTime dateCreation;
