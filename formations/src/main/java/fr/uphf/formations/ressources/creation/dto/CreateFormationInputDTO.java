@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateFormationInputDTO {
+    private Integer id;
     private String libelle;
     private String description;
     private Integer prix;
