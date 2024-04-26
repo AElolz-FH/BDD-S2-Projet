@@ -21,6 +21,7 @@ public class Formations {
     private Formateur formateur;
     @OneToMany
     private List<Participant> participants;
-
+    @OneToMany
+    private List<Seance> seances;
     private Integer prix;
 }
