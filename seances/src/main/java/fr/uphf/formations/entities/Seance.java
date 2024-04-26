@@ -15,7 +15,7 @@ import java.util.List;
 public class Seance {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Integer idSalle;
     private LocalDateTime date;
     private String duree;
     private String batiment;
@@ -25,4 +25,6 @@ public class Seance {
     private Integer numeroSalle;
     private String nomFormation;
     private String nomFormateur;
+    @OneToOne
+    private Salle salles;
 }

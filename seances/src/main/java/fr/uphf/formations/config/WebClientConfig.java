@@ -6,11 +6,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-
 public class WebClientConfig {
-    @LoadBalanced
+
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
+    }
+
+    @Bean
+    @LoadBalanced
+    public WebClient webClient() {
+        return webClientBuilder()
+                .baseUrl("http://localhost:9000") // Définissez votre URL de base ici
+                .build();
     }
 }
