@@ -1,4 +1,4 @@
-package fr.uphf.formations.ressources.modification.dto;
+package fr.uphf.formations.ressources.modification.dto.AddSeance;
 
 import lombok.*;
 

@@ -1,6 +1,7 @@
 package fr.uphf.formations.ressources;
 
 
+import fr.uphf.formations.dto.addSalleToSeanceOutputDTO;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
 import fr.uphf.formations.dto.getAllSeancesDTO.getAllSeancesDTOOutput;
@@ -51,6 +52,12 @@ public class SeanceRessource {
     public ResponseEntity<putSeanceOutputDTO> putSeanceById(@PathVariable Integer id, @RequestBody putSeanceInputDTO seanceDTO) {
         System.out.println("Requête reçue pour modifier la séance avec l'id : " + id + " ...");
         return ResponseEntity.ok(this.seanceService.putSeanceById(id, seanceDTO));
+    }
+
+    @PutMapping("/{idSalle}/{idSeance}")
+    public ResponseEntity<addSalleToSeanceOutputDTO> addSalleToSeance(@PathVariable Integer idSalle, @PathVariable Integer idSeance) {
+        System.out.println("Requête reçue pour ajouter la salle avec l'id : " + idSalle + " à la séance avec l'id : " + idSeance + " ...");
+        return ResponseEntity.ok(this.seanceService.addSalleToSeance(idSalle, idSeance));
     }
 
     @DeleteMapping("/{id}")

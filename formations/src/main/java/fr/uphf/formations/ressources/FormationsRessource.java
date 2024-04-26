@@ -2,10 +2,9 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
-import fr.uphf.formations.ressources.modification.dto.AddSeanceDTOInput;
-import fr.uphf.formations.ressources.modification.dto.AddSeanceDTOOutput;
-import fr.uphf.formations.ressources.modification.dto.ModifyFormationInputDTO;
-import fr.uphf.formations.ressources.modification.dto.ModifyFormationOutputDTO;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
+import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationInputDTO;
+import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.FormationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

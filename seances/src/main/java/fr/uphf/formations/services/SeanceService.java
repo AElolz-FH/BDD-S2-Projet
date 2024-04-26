@@ -1,26 +1,39 @@
 package fr.uphf.formations.services;
 
+import fr.uphf.formations.config.WebClientConfig;
+import fr.uphf.formations.dto.addSalleToSeanceOutputDTO;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
 import fr.uphf.formations.dto.getAllSeancesDTO.getAllSeancesDTOOutput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
+import fr.uphf.formations.entities.Salle;
 import fr.uphf.formations.entities.Seance;
+import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
+import fr.uphf.formations.ressources.SalleFromAPIDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SeanceService {
     @Autowired
     private SeanceRepository seanceRepository;
-    public SeanceService(SeanceRepository seanceRepository) {
+    @Autowired
+    private SalleRepository salleRepository;
+    @Autowired
+    private WebClientConfig webClient;
+    public SeanceService(SeanceRepository seanceRepository,WebClientConfig webClient, SalleRepository salleRepository) {
         this.seanceRepository = seanceRepository;
+        this.webClient = webClient;
+        this.salleRepository = salleRepository;
     }
 
     public creationSeanceDTOOuput createSeance(creationSeanceDTOInput seanceDTO) {
@@ -79,7 +92,7 @@ public class SeanceService {
         this.seanceRepository.save(seance);
 
         return putSeanceOutputDTO.builder()
-                .id(seance.getId())
+                .id(seance.getIdSalle())
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
                 .batiment(seance.getBatiment())
@@ -95,7 +108,7 @@ public class SeanceService {
         List<getAllSeancesDTOOutput> seancesDTO = new ArrayList<>();
         for (Seance seance : seances) {
             seancesDTO.add(getAllSeancesDTOOutput.builder()
-                    .id(seance.getId())
+                    .id(seance.getIdSalle())
                     .date(seance.getDate().toString())
                     .duree(seance.getDuree())
                     .batiment(seance.getBatiment())
@@ -111,6 +124,55 @@ public class SeanceService {
         Seance s = this.seanceRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("La séance avec l'id " + id + " n'existe pas"));
         this.seanceRepository.delete(s);
         return "La séance avec l'id " + id + " a été supprimée";
+    }
+
+    public addSalleToSeanceOutputDTO addSalleToSeance(Integer idSeance, Integer idSalle){
+
+        Optional<Seance> seance = this.seanceRepository.findById(idSeance);
+        if(seance.isEmpty()) {
+            return addSalleToSeanceOutputDTO.builder().message("La ressource de la séance n'a pas été trouvée").build();
+        }
+        SalleFromAPIDTO salleFromAPIDTO = this.webClient.webClientBuilder()
+                .baseUrl("http://localhost:9000/salles/")
+                .build()
+                .get()
+                .uri("/" + idSalle)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(SalleFromAPIDTO.class)
+                .block();
+
+
+
+
+
+
+        if(salleFromAPIDTO == null) {
+            return addSalleToSeanceOutputDTO.builder().message("La ressource de la salle n'a pas été trouvée").build();
+        }
+
+        Salle toSave = Salle.builder()
+                .id(idSalle)
+                .numeroSalle(salleFromAPIDTO.getNumeroSalle())
+                .capacite(salleFromAPIDTO.getCapacite())
+                .batiment(salleFromAPIDTO.getBatiment())
+                .disponible(salleFromAPIDTO.isDisponible())
+                .build();
+
+        //on sauvegarde la salle distante en base avant d'effectuer l'association
+        this.salleRepository.save(toSave);
+
+        Seance seanceToSave = seance.get();
+        //on associe la salle à la séance
+        seanceToSave.setSalles(toSave);
+        //on save la seance
+        this.seanceRepository.save(seanceToSave);
+
+        return addSalleToSeanceOutputDTO.builder().numeroSalle(toSave.getNumeroSalle())
+                .batiment(toSave.getBatiment())
+                .idSeance(idSeance)
+                .message("La salle a été ajoutée à la séance")
+                .build();
     }
 
 }
