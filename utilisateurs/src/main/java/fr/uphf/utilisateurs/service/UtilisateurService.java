@@ -28,13 +28,16 @@ public class UtilisateurService {
         List<getUtilisateursResponseDTO> listReponse = new ArrayList<>();
         for (Utilisateur user : users) {
             listReponse.add(getUtilisateursResponseDTO.builder()
+                    .id(user.getId())
                     .nom(user.getNom())
                     .prenom(user.getPrenom())
                     .email(user.getEmail())
+                    .Formateur(user.isFormateur())
                     .build());
         }
         return listReponse;
     }
+
 
     public getUtilisateursResponseDTO getOneUserById(Integer id) {
         Utilisateur user = this.utilisateurRepository.findById(id);
@@ -84,5 +87,14 @@ public class UtilisateurService {
                 .id(user.getId())
                 .Formateur(user.isFormateur())
                 .build();
+    }
+
+    public String deleteUser(String nom,String prenom) {
+        Utilisateur user = this.utilisateurRepository.findByNomAndPrenom(nom, prenom);
+        if(user == null){
+            throw new RuntimeException("Aucun utilisateur trouvé");
+        }
+        this.utilisateurRepository.delete(user);
+        return "Utilisateur supprimé";
     }
 }

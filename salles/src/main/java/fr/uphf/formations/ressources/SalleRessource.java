@@ -3,6 +3,8 @@ package fr.uphf.formations.ressources;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
+import fr.uphf.formations.dto.getSalleByNumAndBatDTO.getSalleByNumAndBatDTOOutput;
+import fr.uphf.formations.dto.getSalleByNumeroDTO.getSalleByNumeroDTOOutput;
 import fr.uphf.formations.dto.getSalleDTOid.getSalleDTOidOutput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOInput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
@@ -67,8 +69,21 @@ public class SalleRessource {
         return ResponseEntity.ok(getSalleByIdResponseDTO);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/")
+    @GetMapping("/byNum/{numeroSalle}")
+    public ResponseEntity<getSalleByNumeroDTOOutput> getSalleByNumero(@PathVariable Integer numeroSalle) throws SalleNotFoundException {
+        getSalleByNumeroDTOOutput getSalleByNumeroDTOOutput = this.salleService.getSalleByNumero(numeroSalle);
+        System.out.println("Requête reçue pour obtenir une salle par son numéro");
+        return ResponseEntity.ok(getSalleByNumeroDTOOutput);
+    }
+
+    @GetMapping("/numeroSalle={numeroSalle}/batiment={batiment}")
+    public ResponseEntity<getSalleByNumAndBatDTOOutput> getSalleByNumAndBat(@PathVariable(required = true) Integer numeroSalle,@PathVariable(required = true) String batiment) throws SalleNotFoundException {
+        getSalleByNumAndBatDTOOutput getSalleByNumAndBatDTOOutput = this.salleService.getSalleByNumeroAndBat(numeroSalle,batiment);
+        System.out.println("Requête reçue pour obtenir une salle par son numéro et son batiment");
+        return ResponseEntity.ok(getSalleByNumAndBatDTOOutput);
+    }
+
+    @GetMapping("")
     public ResponseEntity<getAllSallesDTOOutput> getAllSalles() {
         getAllSallesDTOOutput getAllSallesResponseDTO = this.salleService.getAllSalles();
         System.out.println("Requête reçue pour obtenir toutes les salles");
@@ -87,6 +102,13 @@ public class SalleRessource {
         modifierSalleDispoDTOOutput modifierSalleResponseDTO = this.salleService.modifierDispoSalle(salleDTO);
         System.out.println("Requête reçue pour modifier la disponibilité d'une salle");
         return ResponseEntity.ok(modifierSalleResponseDTO);
+    }
+
+    @DeleteMapping("/numeroSalle={numeroSalle}/batiment={batiment}")
+    public ResponseEntity<String> deleteSalle(@PathVariable(required = true) Integer numeroSalle,@PathVariable(required = true) String batiment) {
+        this.salleService.deleteSalle(numeroSalle,batiment);
+        System.out.println("Requête reçue pour supprimer une salle");
+        return ResponseEntity.ok("Salle supprimée");
     }
 
 }

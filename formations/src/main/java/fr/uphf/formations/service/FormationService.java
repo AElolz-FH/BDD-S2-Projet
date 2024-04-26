@@ -61,6 +61,7 @@ public class FormationService {
 
     private CreateFormationInputDTO mapEntityToDTO(Formations formationEntity) {
         return CreateFormationInputDTO.builder()
+                .id(formationEntity.getId())
                 .libelle(formationEntity.getLibelle())
                 .description(formationEntity.getDescription())
                 .prix(formationEntity.getPrix())
