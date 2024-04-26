@@ -2,6 +2,9 @@ package fr.uphf.formations.ressources.modification.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Builder
 @Getter
 @Setter
@@ -12,6 +15,7 @@ public class ModifyFormationOutputDTO {
     private String description;
     private double prix;
     private ModifyFormateurPayload formateur;
+    private List<ModifySeancePayload> seances;
 
     @Builder
     @Getter
@@ -24,5 +28,15 @@ public class ModifyFormationOutputDTO {
         private String nom;
         private String email;
         private String prenom;
+    }
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ModifySeancePayload{
+        private Integer id;
+        private LocalDateTime dateDebut;
+        private LocalDateTime dateFin;
     }
 }

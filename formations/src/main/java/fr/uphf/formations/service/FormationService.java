@@ -1,19 +1,28 @@
 package fr.uphf.formations.service;
 import fr.uphf.formations.entities.Formateur;
+import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.repository.FormateurRepository;
+import fr.uphf.formations.repository.SeanceRepository;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
 import fr.uphf.formations.ressources.FormationDTOResponse;
 import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
+import fr.uphf.formations.ressources.modification.dto.AddSeanceDTOInput;
+import fr.uphf.formations.ressources.modification.dto.AddSeanceDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationInputDTO;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationOutputDTO;
+import fr.uphf.formations.service.api.SeanceFromAPIDTO;
 import fr.uphf.formations.service.api.UtilisateurFromAPIDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.beans.Transient;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +32,8 @@ public class FormationService {
     private final FormationRepository formationRepository;
     @Autowired
     private FormateurRepository formateurRepository;
+    @Autowired
+    private SeanceRepository seanceRepository;
     @Autowired
     private WebClient.Builder webClient;
 
@@ -42,6 +53,8 @@ public class FormationService {
                 .libelle(createFormationInputDTO.getLibelle())
                 .description(createFormationInputDTO.getDescription())
                 .prix(createFormationInputDTO.getPrix())
+                .formateur(null)
+                .participants(null)
                 .build();
         Formations savedFormation = formationRepository.save(formation);
         return EntityToCreateFormationResponseDTO(String.valueOf(savedFormation.getId()));
@@ -130,6 +143,58 @@ public class FormationService {
                         .id(formateur.getId())
                         .formateur(formateur.isFormateur())
                         .build())
+
+                .build();
+    }
+
+    @Transactional
+    public AddSeanceDTOOutput addSeance(String idFormation,String idSeance) {
+        Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
+        List<Seance> seances = this.seanceRepository.findAll();
+        if (seances == null) {
+            System.out.println("La liste de séances est vide pour le moment");
+            seances = new ArrayList<>();
+        }
+
+        SeanceFromAPIDTO seanceFromAPIDTO = webClient.baseUrl("http://localhost:9000/seances/")
+                .build()
+                .get()
+                .uri("/" + idSeance)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(SeanceFromAPIDTO.class)
+                .block();
+
+        Seance SeanceToAdd = Seance.builder()
+                .id(Integer.valueOf(idSeance))
+                .date(seanceFromAPIDTO.getDate())
+                .duree(seanceFromAPIDTO.getDuree())
+                .dateFin(seanceFromAPIDTO.getDate().plusHours(Long.parseLong(seanceFromAPIDTO.getDuree())))
+                .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
+                .batiment(seanceFromAPIDTO.getBatiment())
+                .build();
+
+        this.seanceRepository.save(SeanceToAdd);
+
+        List<Seance> seancesFromFormation = formation.getSeances();
+        seancesFromFormation.add(SeanceToAdd);
+
+        formation.setSeances(seancesFromFormation);
+
+        this.formationRepository.save(formation);
+        this.formationRepository.flush();
+
+        if (formation.getSeances() == null) {
+            throw new RuntimeException("La séance n'a pas été ajoutée");
+        }
+        System.out.println("La séance a été ajoutée");
+
+        return AddSeanceDTOOutput.builder()
+                .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
+                .idSeance(Integer.valueOf(idSeance))
+                .duree(seanceFromAPIDTO.getDuree())
+                .batiment(seanceFromAPIDTO.getBatiment())
+                .date(seanceFromAPIDTO.getDate())
                 .build();
     }
 

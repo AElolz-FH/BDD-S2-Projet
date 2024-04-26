@@ -6,18 +6,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class RemoteResourceService {
+public class RemoteResourceSeance {
 
     private final WebClient webClient;
 
     @Autowired
-    public RemoteResourceService(WebClient.Builder webClientBuilder) {
+    public RemoteResourceSeance(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:9000").build();
     }
 
     public Mono<String> fetchRemoteResource() {
         return webClient.get()
-                .uri("/utilisateurs")
+                .uri("/seances")
                 .retrieve()
                 .bodyToMono(String.class);
     }

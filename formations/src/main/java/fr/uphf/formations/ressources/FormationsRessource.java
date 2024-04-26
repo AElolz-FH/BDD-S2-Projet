@@ -2,6 +2,8 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
+import fr.uphf.formations.ressources.modification.dto.AddSeanceDTOInput;
+import fr.uphf.formations.ressources.modification.dto.AddSeanceDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationInputDTO;
 import fr.uphf.formations.ressources.modification.dto.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.FormationService;
@@ -30,6 +32,12 @@ public class FormationsRessource {
     public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
         System.out.println("Requête reçue pour modifier une formation avec l'ID : " + idFormation);
         return ResponseEntity.ok(this.formationService.modifyFormation(idFormation, modifyFormationInputDTO));
+    }
+
+    @PutMapping("/{idFormation}/{idSeance}")
+    public ResponseEntity<AddSeanceDTOOutput> addSeanceToFormation(@PathVariable String idFormation, @PathVariable String idSeance) {
+        System.out.println("Requête reçue pour ajouter une séance d'id "+idSeance+" à une formation avec l'ID : " + idFormation);
+        return ResponseEntity.ok(this.formationService.addSeance(idFormation, idSeance));
     }
 
 
