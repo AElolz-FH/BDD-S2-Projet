@@ -34,7 +34,7 @@ public class SalleService {
         List<Salles> salles = this.salleRepository.findAll();
         if(salles.stream().anyMatch(salle -> salle.getNumeroSalle().equals(salleDTO.getNumeroSalle()))){
             System.out.println("Salle already exists");
-            throw new RuntimeException("Salle already exists");
+            return creationSalleDTOOutput.builder().message("La salle existe déjà").build();
         }
         Salles salleBase = Salles.builder()
                 .numeroSalle(salleDTO.getNumeroSalle())
@@ -51,12 +51,13 @@ public class SalleService {
                 .nomSalle(salleBase.getNomSalle())
                 .capacite(salleBase.getCapacite())
                 .batiment(salleBase.getBatiment())
+                .message("La salle a été créée avec succès")
                 .build();
     }
 
     public getSalleDTOidOutput getSalleById(Integer id) throws SalleNotFoundException {
         //si la salle n'est pas dans la base alors throw une exception salle non trouvée
-        Salles salle = this.salleRepository.findById(id).orElseThrow(() -> new RuntimeException("Salles not found"));
+        Salles salle = this.salleRepository.findById(id).orElseThrow(() -> new RuntimeException("Salle not found"));
         //sinon on retourne un dto en prenant les attributs de la salle
         return getSalleDTOidOutput.builder()
                 .id(salle.getId())
@@ -64,54 +65,48 @@ public class SalleService {
                 .capacite(salle.getCapacite())
                 .batiment(salle.getBatiment())
                 .isDisponible(salle.isDisponible())
+                .message("La salle a été trouvée avec succès")
                 .build();
-
     }
+
     public getAllSallesDTOOutput getAllSalles() {
-        return getAllSallesDTOOutput.builder()
-                .salles(salleRepository.findAll().stream().map(salle -> getAllSallesDTOOutput.getSallesDTOOutput.builder()
-                        .id(salle.getId())
-                        .numeroSalle(salle.getNumeroSalle())
-                        .capacite(salle.getCapacite())
-                        .nomSalle(salle.getNomSalle())
-                        .batiment(salle.getBatiment())
-                        .isDisponible(salle.isDisponible())
-                        .build()).collect(Collectors.toList()))
+        List<Salles> salles = salleRepository.findAll();
+        if(salles.isEmpty()){
+            return getAllSallesDTOOutput.builder().message("Aucune salle n'a été trouvée").build();
+        }
+        return getAllSallesDTOOutput.builder().salles(salles.stream().map(salle -> getAllSallesDTOOutput.getSallesDTOOutput.builder()
+                .id(salle.getId())
+                .numeroSalle(salle.getNumeroSalle())
+                .capacite(salle.getCapacite())
+                .nomSalle(salle.getNomSalle())
+                .batiment(salle.getBatiment())
+                .isDisponible(salle.isDisponible())
+                .build()).collect(Collectors.toList()))
+                .message("Les salles ont été trouvées avec succès")
                 .build();
     }
 
     public modifierSalleDTOOutput modifierSalle(modifierSalleDTOInput salleDTO) {
         Salles salle = this.salleRepository.findByNumeroSalle(salleDTO.getNumeroSalle());
         if (salle == null) {
-            throw new RuntimeException("Salle not found");
+            return modifierSalleDTOOutput.builder().message("La salle n'a pas été trouvée").build();
         }
 
-        Salles temp = salle;
+        salle.setId(salle.getId());
+        salle.setCapacite(salleDTO.getCapacite());
+        salle.setNomSalle(salleDTO.getNomSalle());
+        salle.setNumeroSalle(salleDTO.getNumeroSalle());
+        salle.setBatiment(salleDTO.getBatiment());
+        salle.setDisponible(salle.isDisponible());
 
-        Salles salleModifiee = Salles.builder()
-                .numeroSalle(salleDTO.getNumeroSalle())
-                .nomSalle(salleDTO.getNomSalle())
-                .capacite(salleDTO.getCapacite())
-                .batiment(salleDTO.getBatiment())
-                .build();
-
-        this.salleRepository.delete(salle);
-
-        salleModifiee.setId(temp.getId());
-        salleModifiee.setCapacite(salleDTO.getCapacite());
-        salleModifiee.setNomSalle(salleDTO.getNomSalle());
-        salleModifiee.setNumeroSalle(salleDTO.getNumeroSalle());
-        salleModifiee.setBatiment(salleDTO.getBatiment());
-        salleModifiee.setDisponible(temp.isDisponible());
-
-
-        this.salleRepository.save(salleModifiee);
+        this.salleRepository.save(salle);
 
         return modifierSalleDTOOutput.builder()
-                .numeroSalle(salleModifiee.getNumeroSalle())
-                .nomSalle(salleModifiee.getNomSalle())
-                .capacite(salleModifiee.getCapacite())
-                .batiment(salleDTO.getBatiment())
+                .numeroSalle(salle.getNumeroSalle())
+                .nomSalle(salle.getNomSalle())
+                .capacite(salle.getCapacite())
+                .batiment(salle.getBatiment())
+                .message("La salle a été modifiée avec succès")
                 .build();
     }
 
@@ -120,7 +115,7 @@ public class SalleService {
         Salles salle = this.salleRepository.findByNumeroSalle(modifierSalleDTOInput.getNumeroSalle());
 
         if (salle == null) {
-            throw new RuntimeException("Salle not found");
+            return modifierSalleDispoDTOOutput.builder().message("La salle n'a pas été trouvée").build();
         }
 
         salle.setDisponible(modifierSalleDTOInput.isDisponible());
@@ -129,13 +124,14 @@ public class SalleService {
         return modifierSalleDispoDTOOutput.builder()
                 .numeroSalle(salle.getNumeroSalle())
                 .isDisponible(salle.isDisponible())
+                .message("La disponibilité de la salle a été modifiée avec succès")
                 .build();
     }
 
     public getSalleByNumeroDTOOutput getSalleByNumero(@RequestParam(required = true) Integer numeroSalle){
         Salles salle = this.salleRepository.findByNumeroSalle(numeroSalle);
         if(salle == null){
-            throw new RuntimeException("Salle not found");
+            return getSalleByNumeroDTOOutput.builder().message("La salle n'a pas été trouvée").build();
         }
         return getSalleByNumeroDTOOutput.builder()
                 .numeroSalle(String.valueOf(salle.getNumeroSalle()))
@@ -143,13 +139,14 @@ public class SalleService {
                 .capacite(salle.getCapacite())
                 .batiment(salle.getBatiment())
                 .isDisponible(salle.isDisponible())
+                .message("La salle a été trouvée avec succès")
                 .build();
     }
 
     public getSalleByNumAndBatDTOOutput getSalleByNumeroAndBat(Integer numeroSalle,String batiment){
         Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
         if(salle == null){
-            throw new RuntimeException("Salle not found");
+            throw new RuntimeException("Salle non trouvée");
         }
         return getSalleByNumAndBatDTOOutput.builder()
                 .numeroSalle(String.valueOf(salle.getNumeroSalle()))
@@ -157,13 +154,14 @@ public class SalleService {
                 .capacite(salle.getCapacite())
                 .batiment(salle.getBatiment())
                 .isDisponible(salle.isDisponible())
+                .message("La salle a été trouvée avec succès")
                 .build();
     }
 
     public String deleteSalle(Integer numeroSalle, String batiment) {
         Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
         if(salle == null){
-            throw new RuntimeException("Salle not found");
+            return "La salle n'a pas été trouvée";
         }
         this.salleRepository.delete(salle);
         return "La salle : " + salle.getNomSalle() + " a été supprimée";

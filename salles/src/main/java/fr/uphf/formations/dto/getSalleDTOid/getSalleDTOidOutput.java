@@ -14,4 +14,5 @@ public class getSalleDTOidOutput {
     private Integer capacite;
     private String batiment;
     private boolean isDisponible;
+    private String message;
 }

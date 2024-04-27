@@ -13,4 +13,5 @@ public class modifierSalleDTOOutput {
     private Integer capacite;
     private String nomSalle;
     private String batiment;
+    private String message;
 }

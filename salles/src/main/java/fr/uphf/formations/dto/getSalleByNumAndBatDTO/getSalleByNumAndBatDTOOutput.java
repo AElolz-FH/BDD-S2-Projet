@@ -13,4 +13,5 @@ public class getSalleByNumAndBatDTOOutput {
     private int capacite;
     private String batiment;
     private boolean isDisponible;
+    private String message;
 }
