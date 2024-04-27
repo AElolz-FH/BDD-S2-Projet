@@ -111,7 +111,7 @@ public class FormationService {
                 .build();
     }
 
-    public ModifyFormationOutputDTO modifyFormation(String idFormation, ModifyFormationInputDTO modifyFormationInputDTO) {
+    public ModifyFormationOutputDTO modifyFormation(String idFormation, String idFormateur) {
         // Verifier que la formation existe à partir de l'id formation fournit en entrée de la méthode
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         // Verifier que le formateur existe à partir de l'id formateur fournit en entrée de la méthode en appelant l'API sur utilisateur
@@ -119,7 +119,7 @@ public class FormationService {
         UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost:9000/utilisateurs/")
                 .build()
                 .get()
-                .uri("/" + modifyFormationInputDTO.getIdFormateur())
+                .uri("/" + "idFormation="+idFormation+"/idFormateur="+idFormateur)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(UtilisateurFromAPIDTO.class)
