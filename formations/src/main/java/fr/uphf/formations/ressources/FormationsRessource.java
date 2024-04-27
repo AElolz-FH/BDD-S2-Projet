@@ -26,28 +26,30 @@ public class FormationsRessource {
     public ResponseEntity<CreateFormationResponseDTO> postFormations(@RequestBody CreateFormationInputDTO formationDTO) {
         CreateFormationResponseDTO createFormationResponseDTO = this.formationService.createFormation(formationDTO);
         String message = createFormationResponseDTO.getMessage();
-        if (message.equals("Le libellé de la formation ne peut pas être vide")){
+        if (message.equals("Le libellé de la formation ne peut pas être vide") || message==null){
             return ResponseEntity.badRequest().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
         }
-        if(message.equals("La formation n'a pas été créée")){
+        if(message.equals("La formation n'a pas été créée") || message==null){
             return ResponseEntity.internalServerError().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
+        }
+        if(message.equals("La formation existe déjà")){
+            return ResponseEntity.badRequest().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
         }
         System.out.println("Requête reçue pour créer une formation");
         return ResponseEntity.ok(createFormationResponseDTO);
     }
 
-    @PutMapping("/{idFormation}")
-    public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
-        System.out.println("Requête reçue pour modifier une formation avec l'ID : " + idFormation);
-        ModifyFormationOutputDTO modifyFormationOutputDTO = this.formationService.modifyFormation(idFormation, modifyFormationInputDTO);
+    @PutMapping("/idFormation={idFormation}/idFormateur={idFormateur}")
+    public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @PathVariable String idFormateur) {
+        ModifyFormationOutputDTO modifyFormationOutputDTO = this.formationService.modifyFormation(idFormation, idFormateur);
         if(modifyFormationOutputDTO.getMessage().equals("L'utilisateur n'est pas un formateur")){
             return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
         }
         if(modifyFormationOutputDTO.getMessage().equals("La formation n'existe pas")){
-            return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
+            return ResponseEntity.status(404).body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
         }
         if(modifyFormationOutputDTO.getMessage().equals("Le formateur n'a pas été trouvé")){
-            return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
+            return ResponseEntity.status(404).body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
         }
         return ResponseEntity.ok(modifyFormationOutputDTO);
     }

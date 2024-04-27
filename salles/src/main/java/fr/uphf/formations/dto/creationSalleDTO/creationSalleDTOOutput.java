@@ -12,4 +12,5 @@ public class creationSalleDTOOutput {
     private Integer capacite;
     private String nomSalle;
     private String batiment;
+    private String message;
 }

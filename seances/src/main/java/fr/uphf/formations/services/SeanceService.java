@@ -13,6 +13,7 @@ import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.ressources.SalleFromAPIDTO;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -40,17 +41,21 @@ public class SeanceService {
         List<Seance> seances = this.seanceRepository.findAll();
         Seance seance = Seance.builder()
                 .date(seanceDTO.getDate())
-                .duree(seanceDTO.getDuree())
-                .batiment(seanceDTO.getBatiment())
-                .idUtilisateurs(seanceDTO.getIdUtilisateurs())
-                .nomFormateur(seanceDTO.getNomFormateur())
-                .numeroSalle(seanceDTO.getNumeroSalle())
-                .nomSalle(seanceDTO.getNomFormation())
-                .nomFormation(seanceDTO.getNomFormation())
+                .duree(String.valueOf(seanceDTO.getDuree()))
                 .build();
+        if(seance==null){
+            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée").build();
+        }
+        if(seance.getDate().equals(null) || seance.getDuree().equals(null)){
+            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build();
+        }
 
-        if(seances.stream().anyMatch(s -> s.getDate().equals(seance.getDate()) && s.getNumeroSalle().equals(seance.getNumeroSalle()) && s.getBatiment().equals(seance.getBatiment())))
-            throw new IllegalArgumentException(String.format("La salle %s du batiment %s est déjà occupée à cette date", seance.getNumeroSalle(), seance.getBatiment()));
+
+        if (seances.stream().anyMatch(s -> s.getDate().equals(seance.getDate()) && s.getDuree().equals(seance.getDuree()))) {
+            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date avec cette durée").build();
+        }
+
+
 
         //sauvegarder la séance en base
         this.seanceRepository.save(seance);
@@ -58,31 +63,30 @@ public class SeanceService {
         return creationSeanceDTOOuput.builder()
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
-                .batiment(seance.getBatiment())
-                .idUtilisateurs(seance.getIdUtilisateurs())
-                .nomFormateur(seance.getNomFormateur())
-                .numeroSalle(seance.getNumeroSalle())
-                .nomFormation(seance.getNomFormation())
+                .message("La séance a été créée")
                 .build();
 
     }
 
     public getSeanceByIdDTOOutput getSeanceById(Integer id) {
         Seance seance = this.seanceRepository.findById(id).get();
+        if(seance.equals(null)){
+            return getSeanceByIdDTOOutput.builder().message("La séance n'existe pas ou n'a pas été trouvée").build();
+        }
         return getSeanceByIdDTOOutput.builder()
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
                 .batiment(seance.getBatiment())
-                .idUtilisateurs(seance.getIdUtilisateurs())
                 .nomFormateur(seance.getNomFormateur())
                 .numeroSalle(seance.getNumeroSalle())
                 .nomFormation(seance.getNomFormation())
+                .message("La séance a été trouvée")
                 .build();
     }
 
     public putSeanceOutputDTO putSeanceById(Integer id, putSeanceInputDTO putSeanceInputDTO)
     {
-        Seance seance = this.seanceRepository.findById(id).orElseThrow();
+        Seance seance = this.seanceRepository.findById(id).orElseThrow( () -> new NotFoundException("La séance avec l'id " + id + " n'existe pas ou n'a pas été trouvée"));
 
         seance.setDate(LocalDateTime.parse(putSeanceInputDTO.getDate()));
         seance.setDuree(putSeanceInputDTO.getDuree());
@@ -99,6 +103,7 @@ public class SeanceService {
                 .numeroSalle(seance.getNumeroSalle())
                 .nomFormation(seance.getNomFormation())
                 .nomFormateur(seance.getNomFormateur())
+                .message("La séance a été modifiée")
                 .build();
 
     }
@@ -121,8 +126,8 @@ public class SeanceService {
     }
 
     public String deleteSeanceById(Integer id) {
-        Seance s = this.seanceRepository.findById(id).orElseThrow( () -> new IllegalArgumentException("La séance avec l'id " + id + " n'existe pas"));
-        this.seanceRepository.delete(s);
+        Seance seance = this.seanceRepository.findById(id).orElseThrow( () -> new NotFoundException("La séance avec l'id " + id + " n'existe pas"));
+        this.seanceRepository.delete(seance);
         return "La séance avec l'id " + id + " a été supprimée";
     }
 
@@ -141,11 +146,6 @@ public class SeanceService {
                 .retrieve()
                 .bodyToMono(SalleFromAPIDTO.class)
                 .block();
-
-
-
-
-
 
         if(salleFromAPIDTO == null) {
             return addSalleToSeanceOutputDTO.builder().message("La ressource de la salle n'a pas été trouvée").build();

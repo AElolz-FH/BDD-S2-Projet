@@ -11,7 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class getAllSallesDTOOutput {
-    List<getSallesDTOOutput> salles;
+    private List<getSallesDTOOutput> salles;
+    private String message;
     @Getter
     @Setter
     @Builder

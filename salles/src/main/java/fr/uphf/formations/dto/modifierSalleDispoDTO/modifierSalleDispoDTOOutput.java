@@ -10,4 +10,5 @@ import lombok.*;
 public class modifierSalleDispoDTOOutput {
     private Integer numeroSalle;
     private boolean isDisponible;
+    private String message;
 }
