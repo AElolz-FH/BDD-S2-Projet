@@ -40,6 +40,13 @@ public class FormationService {
     }
 
     public List<CreateFormationInputDTO> getAllFormations() {
+        // la liste est chargée deux fois /!\ il vaudrait mieux la charger qu'une seule et unique fois
+        List<Formations> formations = this.formationRepository.findAll();
+        if (formations == null) {
+            CreateFormationResponseDTO.builder()
+                    .message("Aucune formation n'a été trouvée")
+                    .build();
+        }
         return formationRepository.findAll().stream()
                 .map(this::mapEntityToDTO)
                 .collect(Collectors.toList());
@@ -53,7 +60,19 @@ public class FormationService {
                 .formateur(null)
                 .participants(null)
                 .build();
+
+        if (formation.getLibelle().equals("") || formation.getLibelle().isEmpty()) {
+            return CreateFormationResponseDTO.builder()
+                    .message("Le libellé de la formation ne peut pas être vide")
+                    .build();
+        }
+        if(formation == null){
+            return CreateFormationResponseDTO.builder()
+                    .message("La formation n'a pas été créée")
+                    .build();
+        }
         Formations savedFormation = formationRepository.save(formation);
+
         return EntityToCreateFormationResponseDTO(String.valueOf(savedFormation.getId()));
     }
 
@@ -78,26 +97,6 @@ public class FormationService {
                 .build();
     }
 
-    private FormationDTOResponse mapEntityToDTOResponse(Formations formationEntity) {
-        return FormationDTOResponse.builder()
-                .idFormation(formationEntity.getId())
-                .libelle(formationEntity.getLibelle())
-                .description(formationEntity.getDescription())
-                .prix(formationEntity.getPrix())
-                .build();
-    }
-
-    //pour créer une formation
-    private Formations creerFormation(CreateFormationInputDTO createFormationInputDTO) {
-        Formations formation = Formations.builder()
-                .libelle(createFormationInputDTO.getLibelle())
-                .description(createFormationInputDTO.getDescription())
-                .prix(createFormationInputDTO.getPrix())
-                .build();
-        formationRepository.save(formation);
-        return formation;
-    }
-
     public ModifyFormationOutputDTO modifyFormation(String idFormation, ModifyFormationInputDTO modifyFormationInputDTO) {
         // Verifier que la formation existe à partir de l'id formation fournit en entrée de la méthode
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
@@ -113,10 +112,15 @@ public class FormationService {
                 .block();
 
         if(formateur == null) {
-            throw new RuntimeException("Formateur non trouvé");
+            return ModifyFormationOutputDTO.builder()
+                    .message("Le formateur n'a pas été trouvé")
+                    .build();
         }
-        if(formateur.isFormateur() != true) {
-            throw new RuntimeException("L'utilisateur n'est pas un formateur");
+
+        if(!formateur.isFormateur()) {
+            return ModifyFormationOutputDTO.builder()
+                    .message("L'utilisateur n'est pas un formateur")
+                    .build();
         }
 
         Formateur toSave = Formateur.builder()
@@ -140,7 +144,7 @@ public class FormationService {
                         .id(formateur.getId())
                         .formateur(formateur.isFormateur())
                         .build())
-
+                .message("Le formateur a été ajouté à la formation")
                 .build();
     }
 
@@ -149,7 +153,7 @@ public class FormationService {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         List<Seance> seances = this.seanceRepository.findAll();
         if (seances == null) {
-            System.out.println("La liste de séances est vide pour le moment");
+            System.out.println("La liste de séances est vide pour le moment, création de la liste de séances");
             seances = new ArrayList<>();
         }
 
@@ -162,6 +166,12 @@ public class FormationService {
                 .bodyToMono(SeanceFromAPIDTO.class)
                 .block();
 
+        if(seanceFromAPIDTO == null) {
+            return AddSeanceDTOOutput.builder()
+                    .message("La séance distante n'a pas été trouvée")
+                    .build();
+        }
+
         Seance SeanceToAdd = Seance.builder()
                 .id(Integer.valueOf(idSeance))
                 .date(seanceFromAPIDTO.getDate())
@@ -172,19 +182,27 @@ public class FormationService {
                 .build();
 
         this.seanceRepository.save(SeanceToAdd);
+        System.out.println("Sauvegarde de la séance...");
 
         List<Seance> seancesFromFormation = formation.getSeances();
         seancesFromFormation.add(SeanceToAdd);
+        if(seancesFromFormation == null || seancesFromFormation.isEmpty()) {
+            return AddSeanceDTOOutput.builder()
+                    .message("La liste de séances de la formation est vide, la séance n'a pas été ajoutée dans la liste")
+                    .build();
+        }
 
         formation.setSeances(seancesFromFormation);
+        System.out.println("La séance a été ajoutée à la liste de séances de la formation");
 
         this.formationRepository.save(formation);
         this.formationRepository.flush();
 
         if (formation.getSeances() == null) {
-            throw new RuntimeException("La séance n'a pas été ajoutée");
+            return AddSeanceDTOOutput.builder()
+                    .message("La séance n'a pas été ajoutée à la formation")
+                    .build();
         }
-        System.out.println("La séance a été ajoutée");
 
         return AddSeanceDTOOutput.builder()
                 .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
@@ -192,12 +210,16 @@ public class FormationService {
                 .duree(seanceFromAPIDTO.getDuree())
                 .batiment(seanceFromAPIDTO.getBatiment())
                 .date(seanceFromAPIDTO.getDate())
+                .message("La séance a été ajoutée à la formation")
                 .build();
     }
 
     public String deleteFormation(String idFormation) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         formationRepository.delete(formation);
-        return "Formation supprimée";
+        if(formationRepository.findById(idFormation) == null){
+            return "Formation supprimée en base";
+        }
+        return "La formation n'a pas été supprimée";
     }
 }
