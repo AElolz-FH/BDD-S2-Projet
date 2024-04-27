@@ -16,6 +16,7 @@ public class ModifyFormationOutputDTO {
     private double prix;
     private ModifyFormateurPayload formateur;
     private List<ModifySeancePayload> seances;
+    private String message;
 
     @Builder
     @Getter

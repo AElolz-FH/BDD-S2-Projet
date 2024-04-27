@@ -17,4 +17,5 @@ public class CreateFormationResponseDTO {
     private String libelle;
     private String description;
     private Integer prix;
+    private String message;
 }

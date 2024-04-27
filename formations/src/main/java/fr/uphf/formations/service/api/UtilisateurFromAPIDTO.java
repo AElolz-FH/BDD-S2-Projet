@@ -17,4 +17,5 @@ public class UtilisateurFromAPIDTO {
     private String nom;
     private String email;
     private String prenom;
+    private String message;
 }

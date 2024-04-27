@@ -15,4 +15,5 @@ public class CreateFormationInputDTO {
     private String libelle;
     private String description;
     private Integer prix;
+    private String message;
 }
