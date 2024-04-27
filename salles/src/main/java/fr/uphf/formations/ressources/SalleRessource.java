@@ -24,13 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class SalleRessource {
 
     @Autowired
-    private SalleRepository salleRepository;
-
-    @Autowired
     private SalleService salleService;
 
-    SalleRessource(SalleRepository salleRepository, SalleService salleService) {
-        this.salleRepository = salleRepository;
+    SalleRessource(SalleService salleService) {
         this.salleService = salleService;
     }
 
