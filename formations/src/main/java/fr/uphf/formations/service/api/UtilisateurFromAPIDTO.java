@@ -1,8 +1,6 @@
 package fr.uphf.formations.service.api;
 
-import jakarta.persistence.Id;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,5 +15,4 @@ public class UtilisateurFromAPIDTO {
     private String nom;
     private String email;
     private String prenom;
-    private String message;
 }

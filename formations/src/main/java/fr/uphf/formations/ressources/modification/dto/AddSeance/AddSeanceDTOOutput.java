@@ -1,7 +1,5 @@
 package fr.uphf.formations.ressources.modification.dto.AddSeance;
 
-import fr.uphf.formations.entities.Formateur;
-import fr.uphf.formations.entities.Seance;
 import lombok.*;
 
 import java.time.LocalDateTime;

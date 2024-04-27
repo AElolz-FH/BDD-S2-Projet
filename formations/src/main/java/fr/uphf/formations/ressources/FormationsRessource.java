@@ -1,5 +1,6 @@
 package fr.uphf.formations.ressources;
 
+import fr.uphf.formations.repository.FormateurRepository;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
 import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
@@ -22,14 +22,17 @@ public class FormationsRessource {
     @Autowired
     private FormationService formationService;
 
+    @Autowired
+    private FormateurRepository formateurRepository;
+
     @PostMapping("/")
     public ResponseEntity<CreateFormationResponseDTO> postFormations(@RequestBody CreateFormationInputDTO formationDTO) {
         CreateFormationResponseDTO createFormationResponseDTO = this.formationService.createFormation(formationDTO);
         String message = createFormationResponseDTO.getMessage();
-        if (message == "Le libellé de la formation ne peut pas être vide"){
+        if (message.equals("Le libellé de la formation ne peut pas être vide")){
             return ResponseEntity.badRequest().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
         }
-        if(message == "La formation n'a pas été créée"){
+        if(message.equals("La formation n'a pas été créée")){
             return ResponseEntity.internalServerError().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
         }
         System.out.println("Requête reçue pour créer une formation");
@@ -40,13 +43,13 @@ public class FormationsRessource {
     public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @RequestBody ModifyFormationInputDTO modifyFormationInputDTO) {
         System.out.println("Requête reçue pour modifier une formation avec l'ID : " + idFormation);
         ModifyFormationOutputDTO modifyFormationOutputDTO = this.formationService.modifyFormation(idFormation, modifyFormationInputDTO);
-        if(modifyFormationOutputDTO.getMessage()== "L'utilisateur n'est pas un formateur"){
+        if(modifyFormationOutputDTO.getMessage().equals("L'utilisateur n'est pas un formateur")){
             return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
         }
-        if(modifyFormationOutputDTO.getMessage()== "La formation n'existe pas"){
+        if(modifyFormationOutputDTO.getMessage().equals("La formation n'existe pas")){
             return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
         }
-        if(modifyFormationOutputDTO.getMessage()== "Le formateur n'a pas été trouvé"){
+        if(modifyFormationOutputDTO.getMessage().equals("Le formateur n'a pas été trouvé")){
             return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
         }
         return ResponseEntity.ok(modifyFormationOutputDTO);
@@ -56,13 +59,13 @@ public class FormationsRessource {
     public ResponseEntity<AddSeanceDTOOutput> addSeanceToFormation(@PathVariable String idFormation, @PathVariable String idSeance) {
         AddSeanceDTOOutput addSeanceDTOOutput = this.formationService.addSeance(idFormation, idSeance);
         System.out.println("Requête reçue pour ajouter une séance d'id "+idSeance+" à une formation avec l'ID : " + idFormation);
-        if(addSeanceDTOOutput.getMessage()== "La séance distante n'a pas été trouvée"){
+        if(addSeanceDTOOutput.getMessage().equals("La séance distante n'a pas été trouvée")){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(AddSeanceDTOOutput.builder().message(addSeanceDTOOutput.getMessage()).build());
         }
-        if(addSeanceDTOOutput.getMessage()== "La liste de séances de la formation est vide, la séance n'a pas été ajoutée dans la liste"){
+        if(addSeanceDTOOutput.getMessage().equals("La liste de séances de la formation est vide, la séance n'a pas été ajoutée dans la liste")){
             return ResponseEntity.badRequest().body(AddSeanceDTOOutput.builder().message(addSeanceDTOOutput.getMessage()).build());
         }
-        if(addSeanceDTOOutput.getMessage()== "La séance n'a pas été ajoutée à la formation"){
+        if(addSeanceDTOOutput.getMessage().equals("La séance n'a pas été ajoutée à la formation")){
             return ResponseEntity.internalServerError().body(AddSeanceDTOOutput.builder().message(addSeanceDTOOutput.getMessage()).build());
         }
         return ResponseEntity.ok(addSeanceDTOOutput);

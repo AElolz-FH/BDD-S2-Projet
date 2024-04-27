@@ -61,7 +61,7 @@ public class FormationService {
                 .participants(null)
                 .build();
 
-        if (formation.getLibelle() == "") {
+        if (formation.getLibelle().equals("")) {
             return CreateFormationResponseDTO.builder()
                     .message("Le libellé de la formation ne peut pas être vide")
                     .build();
@@ -97,26 +97,6 @@ public class FormationService {
                 .build();
     }
 
-    private FormationDTOResponse mapEntityToDTOResponse(Formations formationEntity) {
-        return FormationDTOResponse.builder()
-                .idFormation(formationEntity.getId())
-                .libelle(formationEntity.getLibelle())
-                .description(formationEntity.getDescription())
-                .prix(formationEntity.getPrix())
-                .build();
-    }
-
-    //pour créer une formation
-    private Formations creerFormation(CreateFormationInputDTO createFormationInputDTO) {
-        Formations formation = Formations.builder()
-                .libelle(createFormationInputDTO.getLibelle())
-                .description(createFormationInputDTO.getDescription())
-                .prix(createFormationInputDTO.getPrix())
-                .build();
-        formationRepository.save(formation);
-        return formation;
-    }
-
     public ModifyFormationOutputDTO modifyFormation(String idFormation, ModifyFormationInputDTO modifyFormationInputDTO) {
         // Verifier que la formation existe à partir de l'id formation fournit en entrée de la méthode
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
@@ -130,15 +110,14 @@ public class FormationService {
                 .retrieve()
                 .bodyToMono(UtilisateurFromAPIDTO.class)
                 .block();
-        formateur.setMessage("Un formateur a été trouvé");
 
         if(formateur == null) {
-            formateur.setMessage("Le formateur n'a pas été trouvé");
             return ModifyFormationOutputDTO.builder()
                     .message("Le formateur n'a pas été trouvé")
                     .build();
         }
-        if(formateur.isFormateur() != true) {
+
+        if(!formateur.isFormateur()) {
             return ModifyFormationOutputDTO.builder()
                     .message("L'utilisateur n'est pas un formateur")
                     .build();
