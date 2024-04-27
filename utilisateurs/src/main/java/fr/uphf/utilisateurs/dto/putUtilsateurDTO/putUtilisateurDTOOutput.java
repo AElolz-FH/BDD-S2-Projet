@@ -10,4 +10,5 @@ import lombok.*;
 public class putUtilisateurDTOOutput {
     private Integer id;
     private boolean Formateur;
+    private String message;
 }

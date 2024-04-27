@@ -5,7 +5,6 @@ import fr.uphf.formations.repository.FormateurRepository;
 import fr.uphf.formations.repository.SeanceRepository;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
-import fr.uphf.formations.ressources.FormationDTOResponse;
 import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
 import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
@@ -53,6 +52,9 @@ public class FormationService {
     }
 
     public CreateFormationResponseDTO createFormation(CreateFormationInputDTO createFormationInputDTO) {
+
+        List<Formations> formations = this.formationRepository.findAll();
+
         Formations formation = Formations.builder()
                 .libelle(createFormationInputDTO.getLibelle())
                 .description(createFormationInputDTO.getDescription())
@@ -61,7 +63,13 @@ public class FormationService {
                 .participants(null)
                 .build();
 
-        if (formation.getLibelle().equals("") || formation.getLibelle().isEmpty()) {
+        if(formations.stream().anyMatch(f -> f.getLibelle().equals(formation.getLibelle()))){
+            return CreateFormationResponseDTO.builder()
+                    .message("La formation existe déjà")
+                    .build();
+        }
+
+        if (formation.getLibelle().isEmpty()) {
             return CreateFormationResponseDTO.builder()
                     .message("Le libellé de la formation ne peut pas être vide")
                     .build();
@@ -73,7 +81,13 @@ public class FormationService {
         }
         Formations savedFormation = formationRepository.save(formation);
 
-        return EntityToCreateFormationResponseDTO(String.valueOf(savedFormation.getId()));
+        return CreateFormationResponseDTO.builder()
+                .id(savedFormation.getId())
+                .libelle(savedFormation.getLibelle())
+                .description(savedFormation.getDescription())
+                .prix(savedFormation.getPrix())
+                .message("La formation a été créée")
+                .build();
     }
 
     public CreateFormationResponseDTO EntityToCreateFormationResponseDTO(String idFormation) {
@@ -217,9 +231,6 @@ public class FormationService {
     public String deleteFormation(String idFormation) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         formationRepository.delete(formation);
-        if(formationRepository.findById(idFormation) == null){
-            return "Formation supprimée en base";
-        }
-        return "La formation n'a pas été supprimée";
+        return "La formation a été supprimée";
     }
 }

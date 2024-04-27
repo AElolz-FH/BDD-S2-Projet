@@ -8,8 +8,6 @@ import fr.uphf.formations.dto.getAllSeancesDTO.getAllSeancesDTOOutput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
-import fr.uphf.formations.entities.Salle;
-import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.services.SeanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +18,8 @@ import java.util.List;
 @RequestMapping
 public class SeanceRessource {
     @Autowired
-    private SeanceRepository seanceRepository;
-    @Autowired
     private SeanceService seanceService;
-    public SeanceRessource(SeanceRepository seanceRepository, SeanceService seanceService) {
-        this.seanceRepository = seanceRepository;
+    public SeanceRessource(SeanceService seanceService) {
         this.seanceService = seanceService;
     }
 
@@ -40,7 +35,7 @@ public class SeanceRessource {
             return ResponseEntity.badRequest().body(creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build());
         }
         System.out.println("Requête reçue pour créer la séance avec la date : " + seanceDTO.getDate() + " ...");
-        return ResponseEntity.ok(this.seanceService.createSeance(seanceDTO));
+        return ResponseEntity.ok(seance);
 
     }
 

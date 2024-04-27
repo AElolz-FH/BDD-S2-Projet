@@ -41,34 +41,28 @@ public class SeanceService {
         List<Seance> seances = this.seanceRepository.findAll();
         Seance seance = Seance.builder()
                 .date(seanceDTO.getDate())
-                .duree(seanceDTO.getDuree())
-                .batiment(seanceDTO.getBatiment())
-                .idUtilisateurs(seanceDTO.getIdUtilisateurs())
-                .nomFormateur(seanceDTO.getNomFormateur())
-                .numeroSalle(seanceDTO.getNumeroSalle())
-                .nomSalle(seanceDTO.getNomFormation())
-                .nomFormation(seanceDTO.getNomFormation())
+                .duree(String.valueOf(seanceDTO.getDuree()))
                 .build();
         if(seance==null){
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée").build();
         }
-        if(seance.getDate().equals(null) || seance.getDuree().equals(null) || seance.getBatiment().equals(null) || seance.getNomFormation().equals(null) || seance.getNumeroSalle().equals(null)){
+        if(seance.getDate().equals(null) || seance.getDuree().equals(null)){
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build();
         }
 
-        if(seances.stream().anyMatch(s -> s.getDate().equals(seance.getDate()) && s.getNumeroSalle().equals(seance.getNumeroSalle()) && s.getBatiment().equals(seance.getBatiment())))
-        {return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date dans cette salle").build();}
+
+        if (seances.stream().anyMatch(s -> s.getDate().equals(seance.getDate()) && s.getDuree().equals(seance.getDuree()))) {
+            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date avec cette durée").build();
+        }
+
+
+
         //sauvegarder la séance en base
         this.seanceRepository.save(seance);
 
         return creationSeanceDTOOuput.builder()
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
-                .batiment(seance.getBatiment())
-                .idUtilisateurs(seance.getIdUtilisateurs())
-                .nomFormateur(seance.getNomFormateur())
-                .numeroSalle(seance.getNumeroSalle())
-                .nomFormation(seance.getNomFormation())
                 .message("La séance a été créée")
                 .build();
 
@@ -83,7 +77,6 @@ public class SeanceService {
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
                 .batiment(seance.getBatiment())
-                .idUtilisateurs(seance.getIdUtilisateurs())
                 .nomFormateur(seance.getNomFormateur())
                 .numeroSalle(seance.getNumeroSalle())
                 .nomFormation(seance.getNomFormation())
@@ -118,11 +111,6 @@ public class SeanceService {
     public List<getAllSeancesDTOOutput> getAllSeances() {
         List<Seance> seances = this.seanceRepository.findAll();
         List<getAllSeancesDTOOutput> seancesDTO = new ArrayList<>();
-        if(seances.isEmpty()) {
-            seancesDTO.add(getAllSeancesDTOOutput.builder().message("Aucune séance n'a été trouvée").build());
-            return seancesDTO;
-        }
-        seancesDTO.get(0).setMessage("Les séances ont été trouvées");
         for (Seance seance : seances) {
             seancesDTO.add(getAllSeancesDTOOutput.builder()
                     .id(seance.getIdSalle())

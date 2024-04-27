@@ -13,10 +13,6 @@ import java.util.List;
 @Builder
 public class creationSeanceDTOInput {
     private LocalDateTime date;
-    private String duree;
-    private String batiment;
-    private Integer numeroSalle;
-    private String nomFormation;
-    private String nomFormateur;
+    private Integer duree;
     private List<Integer> idUtilisateurs;
 }

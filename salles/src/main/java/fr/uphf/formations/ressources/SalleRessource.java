@@ -11,7 +11,6 @@ import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modiferSalleDispoDTOInput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
-import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.services.SalleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,13 +23,9 @@ import org.springframework.web.bind.annotation.*;
 public class SalleRessource {
 
     @Autowired
-    private SalleRepository salleRepository;
-
-    @Autowired
     private SalleService salleService;
 
-    SalleRessource(SalleRepository salleRepository, SalleService salleService) {
-        this.salleRepository = salleRepository;
+    SalleRessource(SalleService salleService) {
         this.salleService = salleService;
     }
 
@@ -97,8 +92,8 @@ public class SalleRessource {
     }
 
     @PutMapping("/{numeroSalle}")
-    public ResponseEntity<modifierSalleDTOOutput> modifierSalles(@RequestBody modifierSalleDTOInput salleDTO) {
-        modifierSalleDTOOutput modifierSalleResponseDTO = this.salleService.modifierSalle(salleDTO);
+    public ResponseEntity<modifierSalleDTOOutput> modifierSalles(@RequestBody modifierSalleDTOInput salleDTO,@PathVariable Integer numeroSalle) {
+        modifierSalleDTOOutput modifierSalleResponseDTO = this.salleService.modifierSalle(salleDTO,numeroSalle);
         System.out.println("Requête reçue pour modifier une salle");
         if(modifierSalleResponseDTO.getMessage().equals("La salle n'a pas été trouvée")){
             System.out.println("Salle non trouvée");
@@ -107,9 +102,9 @@ public class SalleRessource {
         return ResponseEntity.ok(modifierSalleResponseDTO);
     }
 
-    @PutMapping("/dispo")
-    public ResponseEntity<modifierSalleDispoDTOOutput> modifierDispoSalles(@RequestBody modiferSalleDispoDTOInput salleDTO) {
-        modifierSalleDispoDTOOutput modifierSalleResponseDTO = this.salleService.modifierDispoSalle(salleDTO);
+    @PutMapping("/dispo={numeroSalle}")
+    public ResponseEntity<modifierSalleDispoDTOOutput> modifierDispoSalles(@RequestBody modiferSalleDispoDTOInput salleDTO,@PathVariable Integer numeroSalle) {
+        modifierSalleDispoDTOOutput modifierSalleResponseDTO = this.salleService.modifierDispoSalle(salleDTO,numeroSalle);
         if(modifierSalleResponseDTO.getMessage().equals("La salle n'a pas été trouvée")){
             System.out.println("Salle non trouvée");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(modifierSalleResponseDTO.builder().message("Salle non trouvée").build());

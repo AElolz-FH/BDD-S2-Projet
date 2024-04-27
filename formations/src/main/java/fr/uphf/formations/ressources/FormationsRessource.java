@@ -26,11 +26,14 @@ public class FormationsRessource {
     public ResponseEntity<CreateFormationResponseDTO> postFormations(@RequestBody CreateFormationInputDTO formationDTO) {
         CreateFormationResponseDTO createFormationResponseDTO = this.formationService.createFormation(formationDTO);
         String message = createFormationResponseDTO.getMessage();
-        if (message.equals("Le libellé de la formation ne peut pas être vide")){
+        if (message.equals("Le libellé de la formation ne peut pas être vide") || message==null){
             return ResponseEntity.badRequest().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
         }
-        if(message.equals("La formation n'a pas été créée")){
+        if(message.equals("La formation n'a pas été créée") || message==null){
             return ResponseEntity.internalServerError().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
+        }
+        if(message.equals("La formation existe déjà")){
+            return ResponseEntity.badRequest().body(CreateFormationResponseDTO.builder().message(createFormationResponseDTO.getMessage()).build());
         }
         System.out.println("Requête reçue pour créer une formation");
         return ResponseEntity.ok(createFormationResponseDTO);

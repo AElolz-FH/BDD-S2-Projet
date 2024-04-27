@@ -13,4 +13,5 @@ public class getUtilisateursResponseDTO {
     private String prenom;
     private String email;
     private boolean Formateur;
+    private String message;
 }

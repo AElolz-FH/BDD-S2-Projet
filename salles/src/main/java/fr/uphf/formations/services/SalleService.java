@@ -92,8 +92,8 @@ public class SalleService {
                 .build();
     }
 
-    public modifierSalleDTOOutput modifierSalle(modifierSalleDTOInput salleDTO) {
-        Salles salle = this.salleRepository.findByNumeroSalle(salleDTO.getNumeroSalle());
+    public modifierSalleDTOOutput modifierSalle(modifierSalleDTOInput salleDTO,Integer numeroSalle) {
+        Salles salle = this.salleRepository.findByNumeroSalle(numeroSalle);
         if (salle == null) {
             return modifierSalleDTOOutput.builder().message("La salle n'a pas été trouvée").build();
         }
@@ -117,8 +117,8 @@ public class SalleService {
     }
 
 
-    public modifierSalleDispoDTOOutput modifierDispoSalle(modiferSalleDispoDTOInput modifierSalleDTOInput) {
-        Salles salle = this.salleRepository.findByNumeroSalle(modifierSalleDTOInput.getNumeroSalle());
+    public modifierSalleDispoDTOOutput modifierDispoSalle(modiferSalleDispoDTOInput modifierSalleDTOInput,Integer numeroSalle){
+        Salles salle = this.salleRepository.findByNumeroSalle(numeroSalle);
 
         if (salle == null) {
             return modifierSalleDispoDTOOutput.builder().message("La salle n'a pas été trouvée").build();
