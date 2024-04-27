@@ -15,4 +15,5 @@ public class putSeanceOutputDTO {
     private Integer numeroSalle;
     private String nomFormation;
     private String nomFormateur;
+    private String message;
 }

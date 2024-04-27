@@ -13,6 +13,7 @@ import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
 import fr.uphf.formations.entities.Salles;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,6 +37,11 @@ public class SalleService {
             System.out.println("Salle already exists");
             return creationSalleDTOOutput.builder().message("La salle existe déjà").build();
         }
+
+        if(salleDTO.getNumeroSalle().equals(null) || salleDTO.getNomSalle().equals(null) || salleDTO.getBatiment().equals(null)){
+            return creationSalleDTOOutput.builder().message("La salle n'a pas été créée, les attributs ne sont pas tous référencés").build();
+        }
+
         Salles salleBase = Salles.builder()
                 .numeroSalle(salleDTO.getNumeroSalle())
                 .nomSalle(salleDTO.getNomSalle())
@@ -57,7 +63,7 @@ public class SalleService {
 
     public getSalleDTOidOutput getSalleById(Integer id) throws SalleNotFoundException {
         //si la salle n'est pas dans la base alors throw une exception salle non trouvée
-        Salles salle = this.salleRepository.findById(id).orElseThrow(() -> new RuntimeException("Salle not found"));
+        Salles salle = this.salleRepository.findById(id).orElseThrow(() -> new NotFoundException("Salle not found"));
         //sinon on retourne un dto en prenant les attributs de la salle
         return getSalleDTOidOutput.builder()
                 .id(salle.getId())

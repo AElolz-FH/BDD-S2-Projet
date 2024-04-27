@@ -37,6 +37,10 @@ public class SalleRessource {
     @PostMapping("/")
     public ResponseEntity<creationSalleDTOOutput> postSalles(@RequestBody creationSalleDTOInput salleDTO) {
         creationSalleDTOOutput createSalleResponseDTO = this.salleService.createSalle(salleDTO);
+        if(createSalleResponseDTO.getMessage().equals("La salle n'a pas été créée, les attributs ne sont pas tous référencés")){
+            System.out.println("La salle n'a pas été créée, les attributs ne sont pas tous référencés");
+            return ResponseEntity.badRequest().body(createSalleResponseDTO.builder().message("La salle n'a pas été créée, les attributs ne sont pas tous référencés").build());
+        }
         if(createSalleResponseDTO.getMessage().equals("La salle existe déjà")){
             System.out.println("La salle existe déjà");
             return ResponseEntity.badRequest().body(createSalleResponseDTO.builder().message("La salle existe déjà").build());
@@ -48,6 +52,10 @@ public class SalleRessource {
     @GetMapping("/{id}")
     public ResponseEntity<getSalleDTOidOutput> getSalleById(@PathVariable Integer id) throws SalleNotFoundException {
         getSalleDTOidOutput getSalleByIdResponseDTO = this.salleService.getSalleById(id);
+        if(getSalleByIdResponseDTO.getMessage().equals("La salle n'a pas été trouvée")){
+            System.out.println("Salle non trouvée");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getSalleByIdResponseDTO.builder().message("Salle non trouvée").build());
+        }
         System.out.println("Requête reçue pour obtenir une salle");
         return ResponseEntity.ok(getSalleByIdResponseDTO);
     }

@@ -15,4 +15,5 @@ public class getAllSeancesDTOOutput {
     private Integer numeroSalle;
     private String nomFormation;
     private String nomFormateur;
+    private String message;
 }

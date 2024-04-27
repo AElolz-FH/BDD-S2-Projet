@@ -17,4 +17,5 @@ public class getSeanceByIdDTOOutput {
     private String nomFormation;
     private String nomFormateur;
     private List<Integer> idUtilisateurs;
+    private String message;
 }
