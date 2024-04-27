@@ -22,9 +22,6 @@ public class FormationsRessource {
     @Autowired
     private FormationService formationService;
 
-    @Autowired
-    private FormateurRepository formateurRepository;
-
     @PostMapping("/")
     public ResponseEntity<CreateFormationResponseDTO> postFormations(@RequestBody CreateFormationInputDTO formationDTO) {
         CreateFormationResponseDTO createFormationResponseDTO = this.formationService.createFormation(formationDTO);

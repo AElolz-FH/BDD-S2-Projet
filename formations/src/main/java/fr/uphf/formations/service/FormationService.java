@@ -61,7 +61,7 @@ public class FormationService {
                 .participants(null)
                 .build();
 
-        if (formation.getLibelle().equals("")) {
+        if (formation.getLibelle().equals("") || formation.getLibelle().isEmpty()) {
             return CreateFormationResponseDTO.builder()
                     .message("Le libellé de la formation ne peut pas être vide")
                     .build();
