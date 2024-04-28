@@ -171,7 +171,7 @@ public class FormationService {
                 .message("Le formateur a été ajouté à la formation")
                 .build();
     }
-    /*
+
 
     @Transactional
     public AddSeanceDTOOutput addSeance(String idFormation,String idSeance) {
@@ -188,7 +188,7 @@ public class FormationService {
         }
 
 
-        SeanceFromAPIDTO seanceFromAPIDTO = webClient.baseUrl("http://localhost:9000/seances/")
+        SeanceFromAPIDTO seanceFromAPIDTO = webClient.webClientBuilder().baseUrl("http://localhost:9000/seances/")
                 .build()
                 .get()
                 .uri("/" + idSeance)
@@ -252,7 +252,7 @@ public class FormationService {
     }
 
 
-     */
+
 
 
     public String deleteFormation(String idFormation) {

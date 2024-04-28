@@ -55,7 +55,7 @@ public class FormationsRessource {
         return ResponseEntity.ok(modifyFormationOutputDTO);
     }
 
-    /*
+
     @PutMapping("/{idFormation}/{idSeance}")
     public ResponseEntity<AddSeanceDTOOutput> addSeanceToFormation(@PathVariable String idFormation, @PathVariable String idSeance) {
         AddSeanceDTOOutput addSeanceDTOOutput = this.formationService.addSeance(idFormation, idSeance);
@@ -73,7 +73,7 @@ public class FormationsRessource {
     }
 
 
-     */
+
 
     @GetMapping("/")
     public ResponseEntity<List<CreateFormationInputDTO>> getAllFormation() {
