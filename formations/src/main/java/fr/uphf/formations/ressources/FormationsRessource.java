@@ -1,5 +1,6 @@
 package fr.uphf.formations.ressources;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uphf.formations.repository.FormateurRepository;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
@@ -39,8 +40,8 @@ public class FormationsRessource {
         return ResponseEntity.ok(createFormationResponseDTO);
     }
 
-    @PutMapping("/idFormation={idFormation}/idFormateur={idFormateur}")
-    public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @PathVariable String idFormateur) {
+    @PutMapping("users/{idFormation}/{idFormateur}")
+    public ResponseEntity<ModifyFormationOutputDTO> putFormations(@PathVariable String idFormation, @PathVariable String idFormateur) throws JsonProcessingException {
         ModifyFormationOutputDTO modifyFormationOutputDTO = this.formationService.modifyFormation(idFormation, idFormateur);
         if(modifyFormationOutputDTO.getMessage().equals("L'utilisateur n'est pas un formateur")){
             return ResponseEntity.badRequest().body(ModifyFormationOutputDTO.builder().message(modifyFormationOutputDTO.getMessage()).build());
@@ -53,6 +54,7 @@ public class FormationsRessource {
         }
         return ResponseEntity.ok(modifyFormationOutputDTO);
     }
+
 
     @PutMapping("/{idFormation}/{idSeance}")
     public ResponseEntity<AddSeanceDTOOutput> addSeanceToFormation(@PathVariable String idFormation, @PathVariable String idSeance) {
@@ -69,6 +71,8 @@ public class FormationsRessource {
         }
         return ResponseEntity.ok(addSeanceDTOOutput);
     }
+
+
 
 
     @GetMapping("/")

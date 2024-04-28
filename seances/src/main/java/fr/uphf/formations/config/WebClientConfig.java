@@ -14,7 +14,6 @@ public class WebClientConfig {
     }
 
     @Bean
-    @LoadBalanced
     public WebClient webClient() {
         return webClientBuilder()
                 .baseUrl("http://localhost:9000") // Définissez votre URL de base ici

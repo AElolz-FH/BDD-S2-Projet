@@ -40,6 +40,7 @@ public class UtilisateursRessource {
         return ResponseEntity.ok(getUtilisateursResponseDTO);
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public ResponseEntity<getUtilisateursResponseDTO> getOneUserById(@PathVariable Integer id){
         System.out.println("Requête reçue pour l'utilisateur avec l'id : " + id);
