@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,19 @@ public class FormationService {
                 .map(this::mapEntityToDTO)
                 .collect(Collectors.toList());
     }
+
+    //Utilisation de RabbitMQ pour supprimer un formateur d'une formation lorsqu'un utilisateur est supprimé
+    @RabbitListener(queues = "formationQueue")
+    public void onUserDeleted(Integer userId) {
+        List<Formations> formations = formationRepository.findByFormateur_IdUtilisateur(userId);
+        for (Formations formation : formations) {
+            if (formation.getFormateur() != null && formation.getFormateur().getIdUtilisateur().equals(userId)) {
+                formation.setFormateur(null); // Supprimez le formateur de la formation
+                formationRepository.save(formation);
+            }
+        }
+    }
+
 
     public CreateFormationResponseDTO createFormation(CreateFormationInputDTO createFormationInputDTO) {
 

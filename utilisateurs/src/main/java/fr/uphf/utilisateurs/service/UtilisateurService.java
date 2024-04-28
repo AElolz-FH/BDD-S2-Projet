@@ -7,6 +7,7 @@ import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOInput;
 import fr.uphf.utilisateurs.dto.putUtilsateurDTO.putUtilisateurDTOOutput;
 import fr.uphf.utilisateurs.repositories.UtilisateurRepository;
 import fr.uphf.utilisateurs.ressources.Utilisateur;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,21 @@ import java.util.List;
 public class UtilisateurService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Transactional
+    public String deleteUser(String nom, String prenom) {
+        Utilisateur user = this.utilisateurRepository.findByNomAndPrenom(nom, prenom);
+        if (user == null) {
+            return "Aucun utilisateur trouvé";
+        }
+        this.utilisateurRepository.delete(user);
+        // Envoyer un message à RabbitMQ avec l'ID de l'utilisateur supprimé
+        rabbitTemplate.convertAndSend("userExchange", "user.deleted", user.getId());
+        return "Utilisateur supprimé";
+    }
     public List<getUtilisateursResponseDTO> getUtilisateur(){
         List<Utilisateur> users = this.utilisateurRepository.findAll();
         if(users.isEmpty()){
@@ -89,12 +105,5 @@ public class UtilisateurService {
                 .build();
     }
 
-    public String deleteUser(String nom,String prenom) {
-        Utilisateur user = this.utilisateurRepository.findByNomAndPrenom(nom, prenom);
-        if(user == null){
-            return "Aucun utilisateur trouvé";
-        }
-        this.utilisateurRepository.delete(user);
-        return "Utilisateur supprimé";
-    }
+
 }

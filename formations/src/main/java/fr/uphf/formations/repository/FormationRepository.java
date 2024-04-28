@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface FormationRepository extends JpaRepository<Formations,String> {
     public Optional<Formations> findById(String id);
+    List<Formations> findByFormateur_IdUtilisateur(Integer formateurId);
 
     public List<Formations> findAll();
 }
