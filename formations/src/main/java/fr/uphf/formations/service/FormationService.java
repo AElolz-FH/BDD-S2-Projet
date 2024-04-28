@@ -9,6 +9,7 @@ import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
 import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
+import fr.uphf.formations.ressources.creation.dto.FormateurDTO;
 import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.api.SeanceFromAPIDTO;
@@ -46,14 +47,13 @@ public class FormationService {
     }
 
     public List<CreateFormationInputDTO> getAllFormations() {
-        // la liste est chargée deux fois /!\ il vaudrait mieux la charger qu'une seule et unique fois
         List<Formations> formations = this.formationRepository.findAll();
         if (formations == null) {
             CreateFormationResponseDTO.builder()
                     .message("Aucune formation n'a été trouvée")
                     .build();
         }
-        return formationRepository.findAll().stream()
+        return formations.stream()
                 .map(this::mapEntityToDTO)
                 .collect(Collectors.toList());
     }
@@ -65,7 +65,7 @@ public class FormationService {
         Formations formation = Formations.builder()
                 .libelle(createFormationInputDTO.getLibelle())
                 .description(createFormationInputDTO.getDescription())
-                .prix(createFormationInputDTO.getPrix())
+                .prix((int) createFormationInputDTO.getPrix())
                 .formateur(null)
                 .participants(null)
                 .build();
@@ -110,13 +110,24 @@ public class FormationService {
 
 
     private CreateFormationInputDTO mapEntityToDTO(Formations formationEntity) {
+        FormateurDTO formateurDTO = null;
+        if (formationEntity.getFormateur() != null) {
+            formateurDTO = FormateurDTO.builder()
+                    .id(formationEntity.getFormateur().getIdUtilisateur())
+                    .nom(formationEntity.getFormateur().getNom())
+                    .prenom(formationEntity.getFormateur().getPrenom())
+                    .email(formationEntity.getFormateur().getEmail())
+                    .build();
+        }
         return CreateFormationInputDTO.builder()
                 .id(formationEntity.getId())
                 .libelle(formationEntity.getLibelle())
                 .description(formationEntity.getDescription())
                 .prix(formationEntity.getPrix())
+                .formateur(formateurDTO) // Ajouter le formateur au DTO
                 .build();
     }
+
 
     public ModifyFormationOutputDTO modifyFormation(String idFormation, String idFormateur) throws JsonProcessingException {
         Formations formation = formationRepository.findById(idFormation).orElseThrow();

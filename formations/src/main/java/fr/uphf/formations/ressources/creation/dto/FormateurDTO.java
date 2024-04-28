@@ -7,11 +7,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateFormationInputDTO {
+public class FormateurDTO {
     private Integer id;
-    private String libelle;
-    private String description;
-    private double prix;
-    private FormateurDTO formateur;
+    private String nom;
+    private String prenom;
+    private String email;
 }
-

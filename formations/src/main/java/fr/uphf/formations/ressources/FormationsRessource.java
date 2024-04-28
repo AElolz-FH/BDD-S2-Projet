@@ -81,7 +81,6 @@ public class FormationsRessource {
         System.out.println("Requête reçue pour récupérer les formations");
         if(formations.isEmpty()){
             List<CreateFormationInputDTO> formationsResponse = new ArrayList<>();
-            formationsResponse.add(CreateFormationInputDTO.builder().message("Aucune formation trouvée").build());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(formationsResponse);
         }
         return ResponseEntity.ok(formations);

@@ -21,25 +21,3 @@ public class Formateur {
     private String email;
 }
 
-/*
-
-POST /formations
-{
-    "libelle": "Formation Java",
-    "description": "Formation pour apprendre Java",
- */
-
-/*
-PUT /formations/1
-{
-    "formateur": {
-        "idUtilisateur": "1"
-    }
-}
-
-GET /formations
-1ere etape
-
-        -- Aller appeler /utilisateurs/idUtilisateur
-        -- Si l'utilisateur existe on ajoute le formateur à la formation
-*/
