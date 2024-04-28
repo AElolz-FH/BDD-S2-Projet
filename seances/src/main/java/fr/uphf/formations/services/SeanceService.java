@@ -6,6 +6,8 @@ import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
 import fr.uphf.formations.dto.getAllSeancesDTO.getAllSeancesDTOOutput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
+import fr.uphf.formations.dto.nestedPutDTOInput;
+import fr.uphf.formations.dto.nestedPutDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
 import fr.uphf.formations.entities.Salle;
@@ -132,7 +134,6 @@ public class SeanceService {
     }
 
     public addSalleToSeanceOutputDTO addSalleToSeance(Integer idSeance, Integer idSalle){
-
         Optional<Seance> seance = this.seanceRepository.findById(idSeance);
         if(seance.isEmpty()) {
             return addSalleToSeanceOutputDTO.builder().message("La ressource de la séance n'a pas été trouvée").build();
@@ -158,20 +159,40 @@ public class SeanceService {
                 .batiment(salleFromAPIDTO.getBatiment())
                 .disponible(salleFromAPIDTO.isDisponible())
                 .build();
-
-        //on sauvegarde la salle distante en base avant d'effectuer l'association
+        Seance seanceToSave = seance.get();
+        this.seanceRepository.save(seanceToSave);
+        if(toSave.getSeance() == null) {
+            toSave.setSeance(new ArrayList<>());
+        }
+        toSave.getSeance().add(seanceToSave);
         this.salleRepository.save(toSave);
 
-        Seance seanceToSave = seance.get();
-        //on associe la salle à la séance
-        seanceToSave.setSalles(toSave);
-        //on save la seance
-        this.seanceRepository.save(seanceToSave);
-
-        return addSalleToSeanceOutputDTO.builder().numeroSalle(toSave.getNumeroSalle())
+        addSalleToSeanceOutputDTO salle = addSalleToSeanceOutputDTO.builder().numeroSalle(toSave.getNumeroSalle())
                 .batiment(toSave.getBatiment())
                 .idSeance(idSeance)
+                .numeroSalle(toSave.getNumeroSalle())
+                .batiment(toSave.getBatiment())
                 .message("La salle a été ajoutée à la séance")
+                .build();
+
+        this.seanceRepository.save(seanceToSave);
+
+        return salle;
+    }
+
+    public nestedPutDTOOutput changeSeance(Integer idSeance, nestedPutDTOInput nestedPutDTOInput)
+    {
+        Optional<Seance> seance = this.seanceRepository.findById(idSeance);
+        if(seance.isEmpty()) {
+            return nestedPutDTOOutput.builder().message("La séance n'existe pas ou n'a pas été trouvée").build();
+        }
+        Seance toSave = seance.get();
+
+        return nestedPutDTOOutput.builder()
+                .numeroSalle(toSave.getNumeroSalle())
+                .nomFormation(toSave.getNomFormation())
+                .nomFormateur(toSave.getNomFormateur())
+                .message("La séance a été modifiée")
                 .build();
     }
 

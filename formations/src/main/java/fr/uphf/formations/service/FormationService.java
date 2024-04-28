@@ -197,8 +197,6 @@ public class FormationService {
                 .bodyToMono(SeanceFromAPIDTO.class)
                 .block();
 
-
-
         if(seanceFromAPIDTO == null) {
             return AddSeanceDTOOutput.builder()
                     .message("La séance distante n'a pas été trouvée")
@@ -223,11 +221,7 @@ public class FormationService {
             return AddSeanceDTOOutput.builder()
                     .message("La liste de séances de la formation est vide, la séance n'a pas été ajoutée dans la liste")
                     .build();
-
-
         }
-
-
 
         formation.setSeances(seancesFromFormation);
         System.out.println("La séance a été ajoutée à la liste de séances de la formation");
@@ -247,6 +241,8 @@ public class FormationService {
                 .duree(seanceFromAPIDTO.getDuree())
                 .batiment(seanceFromAPIDTO.getBatiment())
                 .date(seanceFromAPIDTO.getDate())
+                .nomFormation(formation.getLibelle())
+                .nomFormateur(formation.getFormateur().getNom() + " " + formation.getFormateur().getPrenom())
                 .message("La séance a été ajoutée à la formation")
                 .build();
     }

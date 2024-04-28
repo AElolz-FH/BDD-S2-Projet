@@ -6,6 +6,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,6 +22,6 @@ public class Salle {
     private String nomSalle;
     private String batiment;
     private boolean disponible;
-    @OneToOne(mappedBy = "salles")
-    private Seance seance;
+    @OneToMany(mappedBy = "salles")
+    private List<Seance> seance;
 }
