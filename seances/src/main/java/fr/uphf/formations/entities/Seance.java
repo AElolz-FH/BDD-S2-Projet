@@ -25,6 +25,6 @@ public class Seance {
     private Integer numeroSalle;
     private String nomFormation;
     private String nomFormateur;
-    @OneToOne
+    @ManyToOne
     private Salle salles;
 }

@@ -6,6 +6,8 @@ import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOOuput;
 import fr.uphf.formations.dto.getAllSeancesDTO.getAllSeancesDTOOutput;
 import fr.uphf.formations.dto.getSeanceByIdDTO.getSeanceByIdDTOOutput;
+import fr.uphf.formations.dto.nestedPutDTOInput;
+import fr.uphf.formations.dto.nestedPutDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
 import fr.uphf.formations.services.SeanceService;
@@ -83,6 +85,14 @@ public class SeanceRessource {
 
         return ResponseEntity.ok(this.seanceService.addSalleToSeance(idSalle, idSeance));
     }
+
+    @PutMapping("/idSeance={idSeance}")
+    public ResponseEntity<nestedPutDTOOutput> changeSeance(@PathVariable Integer idSeance, @RequestBody nestedPutDTOInput nestedPutDTOInput) {
+        nestedPutDTOOutput salle = this.seanceService.changeSeance(idSeance,nestedPutDTOInput);
+        System.out.println("Requête reçue pour ajouter la séance avec l'id : " + idSeance );
+        return ResponseEntity.ok(salle);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSeanceById(@PathVariable Integer id) {

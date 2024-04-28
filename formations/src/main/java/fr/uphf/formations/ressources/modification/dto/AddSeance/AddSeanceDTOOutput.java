@@ -15,5 +15,7 @@ public class AddSeanceDTOOutput {
     private String duree;
     private Integer numeroSalle;
     private String batiment;
+    private String nomFormateur;
+    private String nomFormation;
     private String message;
 }
