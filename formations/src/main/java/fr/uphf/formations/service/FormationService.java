@@ -1,4 +1,6 @@
 package fr.uphf.formations.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.uphf.formations.config.WebClientConfig;
 import fr.uphf.formations.entities.Formateur;
 import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.repository.FormateurRepository;
@@ -8,7 +10,6 @@ import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
 import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
 import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
-import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationInputDTO;
 import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.api.SeanceFromAPIDTO;
 import fr.uphf.formations.service.api.UtilisateurFromAPIDTO;
@@ -16,7 +17,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +31,18 @@ public class FormationService {
     @Autowired
     private SeanceRepository seanceRepository;
     @Autowired
-    private WebClient.Builder webClient;
+    private WebClientConfig webClient;
+    /*
+    @Autowired
+    private UserService userService;
 
-    public FormationService(FormationRepository formationRepository, WebClient.Builder webClientBuilder) {
+     */
+    public FormationService(FormationRepository formationRepository, WebClientConfig webClientConfig/*UserService userService*/,FormateurRepository formateurRepository,SeanceRepository seanceRepository) {
         this.formationRepository = formationRepository;
-        this.webClient = webClientBuilder;
+        this.webClient = webClientConfig;
+        //this.userService = userService;
+        this.formateurRepository = formateurRepository;
+        this.seanceRepository = seanceRepository;
     }
 
     public List<CreateFormationInputDTO> getAllFormations() {
@@ -111,19 +118,21 @@ public class FormationService {
                 .build();
     }
 
-    public ModifyFormationOutputDTO modifyFormation(String idFormation, String idFormateur) {
-        // Verifier que la formation existe à partir de l'id formation fournit en entrée de la méthode
-        Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
-        // Verifier que le formateur existe à partir de l'id formateur fournit en entrée de la méthode en appelant l'API sur utilisateur
-        // Si le formateur n'existe pas, on renvoie une erreur
-        UtilisateurFromAPIDTO formateur = webClient.baseUrl("http://localhost:9000/utilisateurs/")
+    public ModifyFormationOutputDTO modifyFormation(String idFormation, String idFormateur) throws JsonProcessingException {
+        Formations formation = formationRepository.findById(idFormation).orElseThrow();
+
+
+        //UtilisateurFromAPIDTO formateur = userService.getUserData(Integer.parseInt(idFormateur));
+        UtilisateurFromAPIDTO formateur = webClient.webClientBuilder().baseUrl("http://localhost:9000/utilisateurs/")
                 .build()
                 .get()
-                .uri("/" + "idFormation="+idFormation+"/idFormateur="+idFormateur)
+                .uri("/" + idFormateur)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(UtilisateurFromAPIDTO.class)
                 .block();
+
+        //http://localhost:9000/utilisateurs/1
 
         if(formateur == null) {
             return ModifyFormationOutputDTO.builder()
@@ -138,11 +147,12 @@ public class FormationService {
         }
 
         Formateur toSave = Formateur.builder()
+                .idUtilisateur(formateur.getId())
                 .email(formateur.getEmail())
                 .nom(formateur.getNom())
                 .prenom(formateur.getPrenom())
-                .idUtilisateur(formateur.getId())
                 .build();
+
         this.formateurRepository.save(toSave);
         formation.setFormateur(toSave);
 
@@ -161,15 +171,22 @@ public class FormationService {
                 .message("Le formateur a été ajouté à la formation")
                 .build();
     }
+    /*
 
     @Transactional
     public AddSeanceDTOOutput addSeance(String idFormation,String idSeance) {
-        Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
+        Formations formation = formationRepository.findById(idFormation).orElseThrow();
+        if(formation == null) {
+            return AddSeanceDTOOutput.builder()
+                    .message("La formation n'existe pas")
+                    .build();
+        }
         List<Seance> seances = this.seanceRepository.findAll();
         if (seances == null) {
             System.out.println("La liste de séances est vide pour le moment, création de la liste de séances");
             seances = new ArrayList<>();
         }
+
 
         SeanceFromAPIDTO seanceFromAPIDTO = webClient.baseUrl("http://localhost:9000/seances/")
                 .build()
@@ -179,6 +196,8 @@ public class FormationService {
                 .retrieve()
                 .bodyToMono(SeanceFromAPIDTO.class)
                 .block();
+
+
 
         if(seanceFromAPIDTO == null) {
             return AddSeanceDTOOutput.builder()
@@ -204,7 +223,11 @@ public class FormationService {
             return AddSeanceDTOOutput.builder()
                     .message("La liste de séances de la formation est vide, la séance n'a pas été ajoutée dans la liste")
                     .build();
+
+
         }
+
+
 
         formation.setSeances(seancesFromFormation);
         System.out.println("La séance a été ajoutée à la liste de séances de la formation");
@@ -227,6 +250,10 @@ public class FormationService {
                 .message("La séance a été ajoutée à la formation")
                 .build();
     }
+
+
+     */
+
 
     public String deleteFormation(String idFormation) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
