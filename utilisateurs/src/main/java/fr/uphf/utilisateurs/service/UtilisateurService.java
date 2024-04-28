@@ -23,6 +23,7 @@ public class UtilisateurService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    //RabbitMQ : Envoi d'un message à RabbitMQ lors de la suppression d'un utilisateur
     @Transactional
     public String deleteUser(String nom, String prenom) {
         Utilisateur user = this.utilisateurRepository.findByNomAndPrenom(nom, prenom);
