@@ -11,8 +11,10 @@ import fr.uphf.formations.dto.nestedPutDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
 import fr.uphf.formations.dto.ressources.FormationFromAPIDTO;
+import fr.uphf.formations.entities.Formation;
 import fr.uphf.formations.entities.Salle;
 import fr.uphf.formations.entities.Seance;
+import fr.uphf.formations.repositories.FormationRepository;
 import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.dto.ressources.SalleFromAPIDTO;
@@ -32,6 +34,8 @@ public class SeanceService {
     private SeanceRepository seanceRepository;
     @Autowired
     private SalleRepository salleRepository;
+    @Autowired
+    private FormationRepository formationRepository;
     @Autowired
     private WebClientConfig webClient;
     public SeanceService(SeanceRepository seanceRepository,WebClientConfig webClient, SalleRepository salleRepository) {
@@ -59,7 +63,6 @@ public class SeanceService {
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date avec cette durée").build();
         }
 
-        //problème ici
         FormationFromAPIDTO formationFromAPIDTO = webClient.webClientBuilder()
                 .baseUrl("http://localhost:9000/formations/")
                 .build()
@@ -74,11 +77,8 @@ public class SeanceService {
                 .doOnError(error -> {
                     System.out.println("Erreur lors de l'appel API: " + error.getMessage());
                 })
+                .block();
 
-                .block();  // Utilisez block() avec précaution; idéalement, restez dans un flux réactif
-
-
-        //récupérer une salle distante (avec des query params)
         SalleFromAPIDTO salleFromAPIDTO = webClient.webClientBuilder()
                 .baseUrl("http://localhost:9000/salles/")
                 .build()
@@ -89,10 +89,29 @@ public class SeanceService {
                 .bodyToMono(SalleFromAPIDTO.class)
                 .block();
 
-
+        assert salleFromAPIDTO != null;
         System.out.println("Le numéro de la salle distante est : "+salleFromAPIDTO.getNumeroSalle());
 
-        //sauvegarder la séance en base
+        //on ajoute la salle dans le repo de salle
+        Salle salleToSave = Salle.builder()
+                .numeroSalle(salleFromAPIDTO.getNumeroSalle())
+                .capacite(salleFromAPIDTO.getCapacite())
+                .batiment(salleFromAPIDTO.getBatiment())
+                .disponible(salleFromAPIDTO.isDisponible())
+                .build();
+        salleToSave.getSeance().add(seance);
+        this.salleRepository.save(salleToSave);
+
+        assert formationFromAPIDTO != null;
+        Formation formationToSave = Formation.builder()
+                .libelle(formationFromAPIDTO.getLibelle())
+                .description(formationFromAPIDTO.getDescription())
+                .build();
+        formationToSave.getSeance().add(seance);
+
+        //sauvegarder en base
+        this.salleRepository.save(salleToSave);
+        this.formationRepository.save(formationToSave);
         this.seanceRepository.save(seance);
 
         return creationSeanceDTOOuput.builder()
@@ -117,7 +136,7 @@ public class SeanceService {
     }
 
     public getSeanceByIdDTOOutput getSeanceById(Integer id) {
-        Seance seance = this.seanceRepository.findById(id).get();
+        Seance seance = this.seanceRepository.findById(id).orElseThrow();
         if(seance.equals(null)){
             return getSeanceByIdDTOOutput.builder().message("La séance n'existe pas ou n'a pas été trouvée").build();
         }
@@ -125,9 +144,7 @@ public class SeanceService {
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
                 .batiment(seance.getBatiment())
-                .nomFormateur(seance.getNomFormateur())
                 .numeroSalle(seance.getNumeroSalle())
-                .nomFormation(seance.getNomFormation())
                 .message("La séance a été trouvée")
                 .build();
     }
@@ -147,10 +164,9 @@ public class SeanceService {
                 .id(seance.getIdSalle())
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
+                //modif ici
                 .batiment(seance.getBatiment())
                 .numeroSalle(seance.getNumeroSalle())
-                .nomFormation(seance.getNomFormation())
-                .nomFormateur(seance.getNomFormateur())
                 .message("La séance a été modifiée")
                 .build();
 
@@ -166,8 +182,7 @@ public class SeanceService {
                     .duree(seance.getDuree())
                     .batiment(seance.getBatiment())
                     .numeroSalle(seance.getNumeroSalle())
-                    .nomFormation(seance.getNomFormation())
-                    .nomFormateur(seance.getNomFormateur())
+                    //modif ici
                     .build());
         }
         return seancesDTO;
@@ -224,22 +239,6 @@ public class SeanceService {
         this.seanceRepository.save(seanceToSave);
 
         return salle;
-    }
-
-    public nestedPutDTOOutput changeSeance(Integer idSeance, nestedPutDTOInput nestedPutDTOInput)
-    {
-        Optional<Seance> seance = this.seanceRepository.findById(idSeance);
-        if(seance.isEmpty()) {
-            return nestedPutDTOOutput.builder().message("La séance n'existe pas ou n'a pas été trouvée").build();
-        }
-        Seance toSave = seance.get();
-
-        return nestedPutDTOOutput.builder()
-                .numeroSalle(toSave.getNumeroSalle())
-                .nomFormation(toSave.getNomFormation())
-                .nomFormateur(toSave.getNomFormateur())
-                .message("La séance a été modifiée")
-                .build();
     }
 
 }

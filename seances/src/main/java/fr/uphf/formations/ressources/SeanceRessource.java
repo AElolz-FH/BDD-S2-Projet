@@ -86,13 +86,6 @@ public class SeanceRessource {
         return ResponseEntity.ok(this.seanceService.addSalleToSeance(idSalle, idSeance));
     }
 
-    @PutMapping("/idSeance={idSeance}")
-    public ResponseEntity<nestedPutDTOOutput> changeSeance(@PathVariable Integer idSeance, @RequestBody nestedPutDTOInput nestedPutDTOInput) {
-        nestedPutDTOOutput salle = this.seanceService.changeSeance(idSeance,nestedPutDTOInput);
-        System.out.println("Requête reçue pour ajouter la séance avec l'id : " + idSeance );
-        return ResponseEntity.ok(salle);
-    }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSeanceById(@PathVariable Integer id) {

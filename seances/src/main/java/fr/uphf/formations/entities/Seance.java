@@ -23,8 +23,8 @@ public class Seance {
     private List<Integer> idUtilisateurs;
     private String nomSalle;
     private Integer numeroSalle;
-    private String nomFormation;
-    private String nomFormateur;
+    @ManyToOne
+    private Formation formation;
     @ManyToOne
     private Salle salles;
 }
