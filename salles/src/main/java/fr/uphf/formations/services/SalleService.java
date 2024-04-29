@@ -164,7 +164,11 @@ public class SalleService {
                 .build();
     }
 
-    public String deleteSalle(Integer numeroSalle, String batiment) {
+    public Salles getSalleByNumAndBat2(Integer numeroSalle, String batiment) {
+        return this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, batiment);
+    }
+
+        public String deleteSalle(Integer numeroSalle, String batiment) {
         Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
         if(salle == null){
             return "La salle n'a pas été trouvée";
@@ -173,4 +177,18 @@ public class SalleService {
         return "La salle : " + salle.getNomSalle() + " a été supprimée";
     }
 
+    public getSalleByNumAndBatDTOOutput getSalleByNumAndBat(Integer numeroSalle, String batiment) {
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
+        if(salle == null){
+            return getSalleByNumAndBatDTOOutput.builder().message("La salle n'a pas été trouvée").build();
+        }
+        return getSalleByNumAndBatDTOOutput.builder()
+                .numeroSalle(String.valueOf(salle.getNumeroSalle()))
+                .nomSalle(salle.getNomSalle())
+                .capacite(salle.getCapacite())
+                .batiment(salle.getBatiment())
+                .isDisponible(salle.isDisponible())
+                .message("La salle a été trouvée avec succès")
+                .build();
+    }
 }

@@ -272,13 +272,41 @@ public class FormationService {
                 .build();
     }
 
-
-
-
-
     public String deleteFormation(String idFormation) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         formationRepository.delete(formation);
         return "La formation a été supprimée";
+    }
+
+    public getFormationByNameDTOOutput getFormationByName(String nomFormation) {
+        Formations formation = formationRepository.findByLibelle(nomFormation);
+        if (formation == null) {
+            return getFormationByNameDTOOutput.builder()
+                    .message("La formation n'a pas été trouvée")
+                    .build();
+        }
+        if(formation.getFormateur()==null)
+        {
+            return getFormationByNameDTOOutput.builder()
+                    .id(formation.getId())
+                    .libelle(formation.getLibelle())
+                    .description(formation.getDescription())
+                    .message("La formation a été trouvée mais ne possède pas de formateur")
+                    .build();
+        }
+        return getFormationByNameDTOOutput.builder()
+                .id(formation.getId())
+                .libelle(formation.getLibelle())
+                .description(formation.getDescription())
+                .formateur(
+                        FormateurDTO.builder()
+                                .id(formation.getFormateur().getIdUtilisateur())
+                                .nom(formation.getFormateur().getNom())
+                                .prenom(formation.getFormateur().getPrenom())
+                                .email(formation.getFormateur().getEmail())
+                                .build()
+                        )
+                .message("La formation a été trouvée et possède un formateur")
+                .build();
     }
 }

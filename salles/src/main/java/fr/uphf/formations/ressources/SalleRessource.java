@@ -10,6 +10,7 @@ import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOInput;
 import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modiferSalleDispoDTOInput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
+import fr.uphf.formations.entities.Salles;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.services.SalleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,18 +68,26 @@ public class SalleRessource {
         return ResponseEntity.ok(getSalleByNumeroDTOOutput);
     }
 
+
     @GetMapping("/numeroSalle={numeroSalle}/batiment={batiment}")
     public ResponseEntity<getSalleByNumAndBatDTOOutput> getSalleByNumAndBat(@PathVariable(required = true) Integer numeroSalle,@PathVariable(required = true) String batiment) throws SalleNotFoundException {
-        getSalleByNumAndBatDTOOutput getSalleByNumAndBatDTOOutput = this.salleService.getSalleByNumeroAndBat(numeroSalle,batiment);
-        System.out.println("Requête reçue pour obtenir une salle par son numéro et son batiment");
-        if(getSalleByNumAndBatDTOOutput.getMessage().equals("Salle non trouvée")){
-            System.out.println("Salle non trouvée");
-            {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getSalleByNumAndBatDTOOutput.builder().message("Salle non trouvée").build());
-            }
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
+        if(salle.getNumeroSalle() != null || salle.getNumeroSalle() != 0 && (salle.getBatiment() != null || salle.getBatiment().equals(''))){
+            getSalleByNumAndBatDTOOutput output = getSalleByNumAndBatDTOOutput.builder()
+                    .nomSalle(salle.getNomSalle())
+                    .numeroSalle(String.valueOf(salle.getNumeroSalle()))
+                    .capacite(salle.getCapacite())
+                    .batiment(salle.getBatiment())
+                    .isDisponible(salle.isDisponible())
+                    .build();
+            return ResponseEntity.ok(output);
         }
-        return ResponseEntity.ok(getSalleByNumAndBatDTOOutput);
+        return ResponseEntity.badRequest().body(getSalleByNumAndBatDTOOutput.builder()
+                .message("La salle n'a pas été trouvée")
+                .build();
     }
+
+
 
     @GetMapping("")
     public ResponseEntity<getAllSallesDTOOutput> getAllSalles() {

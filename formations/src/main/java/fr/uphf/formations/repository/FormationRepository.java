@@ -14,4 +14,6 @@ public interface FormationRepository extends JpaRepository<Formations,String> {
     List<Formations> findByFormateur_IdUtilisateur(Integer formateurId);
 
     public List<Formations> findAll();
+
+    Formations findByLibelle(String nomFormation);
 }

@@ -72,6 +72,16 @@ public class FormationsRessource {
         return ResponseEntity.ok(addSeanceDTOOutput);
     }
 
+    @GetMapping("/search/{nomFormation}")
+    public ResponseEntity<getFormationByNameDTOOutput> getFormationByName(@PathVariable String nomFormation) {
+        getFormationByNameDTOOutput formation = formationService.getFormationByName(nomFormation);
+        System.out.println("Requête reçue pour récupérer une formation avec le nom : " + nomFormation);
+        if(formation==null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getFormationByNameDTOOutput.builder().message(formation.getMessage()).build());
+        }
+        return ResponseEntity.ok(formation);
+    }
+
 
 
 

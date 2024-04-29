@@ -41,17 +41,18 @@ public class SeanceService {
 
     public creationSeanceDTOOuput createSeance(creationSeanceDTOInput seanceDTO) {
         List<Seance> seances = this.seanceRepository.findAll();
+        if(seanceDTO.getDate() == null || seanceDTO.getDuree() == null){
+            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build();
+        }
+
         Seance seance = Seance.builder()
                 .date(seanceDTO.getDate())
                 .duree(String.valueOf(seanceDTO.getDuree()))
                 .build();
-        if(seance==null){
-            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée").build();
-        }
+
         if(seance.getDate().equals(null) || seance.getDuree().equals(null)){
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build();
         }
-
 
         if (seances.stream().anyMatch(s -> s.getDate().equals(seance.getDate()) && s.getDuree().equals(seance.getDuree()))) {
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date avec cette durée").build();
