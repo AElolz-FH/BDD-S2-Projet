@@ -12,7 +12,9 @@ import java.util.List;
 @Setter
 @Builder
 public class creationSeanceDTOInput {
+    private Integer numeroSalle;
+    private String libelle;
+    private String batiment;
     private LocalDateTime date;
     private Integer duree;
-    private List<Integer> idUtilisateurs;
 }

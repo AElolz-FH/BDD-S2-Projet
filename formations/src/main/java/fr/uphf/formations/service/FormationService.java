@@ -10,6 +10,7 @@ import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
 import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
 import fr.uphf.formations.ressources.creation.dto.FormateurDTO;
+import fr.uphf.formations.ressources.getFormationByNameDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
 import fr.uphf.formations.service.api.SeanceFromAPIDTO;

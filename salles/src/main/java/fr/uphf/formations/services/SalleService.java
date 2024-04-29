@@ -149,7 +149,7 @@ public class SalleService {
                 .build();
     }
 
-    public getSalleByNumAndBatDTOOutput getSalleByNumeroAndBat(Integer numeroSalle,String batiment){
+    public getSalleByNumAndBatDTOOutput getSalleByNumeroAndBat(@RequestParam(required = true) Integer numeroSalle,@RequestParam(required=true) String batiment){
         Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
         if(salle == null){
             throw new RuntimeException("Salle non trouvée");

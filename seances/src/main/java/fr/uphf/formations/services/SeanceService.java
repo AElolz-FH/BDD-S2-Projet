@@ -10,11 +10,12 @@ import fr.uphf.formations.dto.nestedPutDTOInput;
 import fr.uphf.formations.dto.nestedPutDTOOutput;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceInputDTO;
 import fr.uphf.formations.dto.putSeanceDTO.putSeanceOutputDTO;
+import fr.uphf.formations.dto.ressources.FormationFromAPIDTO;
 import fr.uphf.formations.entities.Salle;
 import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
-import fr.uphf.formations.ressources.SalleFromAPIDTO;
+import fr.uphf.formations.dto.ressources.SalleFromAPIDTO;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -58,7 +59,38 @@ public class SeanceService {
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date avec cette durée").build();
         }
 
+        //problème ici
+        FormationFromAPIDTO formationFromAPIDTO = webClient.webClientBuilder()
+                .baseUrl("http://localhost:9000/formations/")
+                .build()
+                .get()
+                .uri("/search/" + seanceDTO.getLibelle())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(FormationFromAPIDTO.class)
+                .doOnSuccess(formation -> {
+                    System.out.println("Réponse API Formation réussie: " + formation);
+                })
+                .doOnError(error -> {
+                    System.out.println("Erreur lors de l'appel API: " + error.getMessage());
+                })
 
+                .block();  // Utilisez block() avec précaution; idéalement, restez dans un flux réactif
+
+
+        //récupérer une salle distante (avec des query params)
+        SalleFromAPIDTO salleFromAPIDTO = webClient.webClientBuilder()
+                .baseUrl("http://localhost:9000/salles/")
+                .build()
+                .get()
+                .uri("/numeroSalle="+seanceDTO.getNumeroSalle()+"/batiment="+seanceDTO.getBatiment())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(SalleFromAPIDTO.class)
+                .block();
+
+
+        System.out.println("Le numéro de la salle distante est : "+salleFromAPIDTO.getNumeroSalle());
 
         //sauvegarder la séance en base
         this.seanceRepository.save(seance);
@@ -66,9 +98,22 @@ public class SeanceService {
         return creationSeanceDTOOuput.builder()
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
+                .salleFromAPIDTO(SalleFromAPIDTO.builder()
+                        .numeroSalle(salleFromAPIDTO.getNumeroSalle())
+                        .capacite(salleFromAPIDTO.getCapacite())
+                        .batiment(salleFromAPIDTO.getBatiment())
+                        .disponible(salleFromAPIDTO.isDisponible())
+                        .build()
+                )
+                .formationFromAPIDTO(FormationFromAPIDTO.builder()
+                        .id(formationFromAPIDTO.getId())
+                        .libelle(formationFromAPIDTO.getLibelle())
+                        .description(formationFromAPIDTO.getDescription())
+                        .message("La formation a été trouvée")
+                        .build()
+                )
                 .message("La séance a été créée")
                 .build();
-
     }
 
     public getSeanceByIdDTOOutput getSeanceById(Integer id) {

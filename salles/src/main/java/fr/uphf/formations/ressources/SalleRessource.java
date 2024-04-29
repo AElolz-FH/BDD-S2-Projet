@@ -12,7 +12,9 @@ import fr.uphf.formations.dto.modifierSalleDispoDTO.modiferSalleDispoDTOInput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
 import fr.uphf.formations.entities.Salles;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
+import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.services.SalleService;
+import jakarta.ws.rs.QueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,8 @@ public class SalleRessource {
 
     @Autowired
     private SalleService salleService;
+    @Autowired
+    private SalleRepository salleRepository;
 
     SalleRessource(SalleService salleService) {
         this.salleService = salleService;
