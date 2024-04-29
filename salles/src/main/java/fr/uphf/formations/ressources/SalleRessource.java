@@ -74,9 +74,9 @@ public class SalleRessource {
 
 
     @GetMapping("/numeroSalle={numeroSalle}/batiment={batiment}")
-    public ResponseEntity<getSalleByNumAndBatDTOOutput> getSalleByNumAndBat(@PathVariable(required = true) Integer numeroSalle,@PathVariable(required = true) String batiment) throws SalleNotFoundException {
-        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
-        if(salle.getNumeroSalle() != null || salle.getNumeroSalle() != 0 && (salle.getBatiment() != null || salle.getBatiment().equals(''))){
+    public ResponseEntity<getSalleByNumAndBatDTOOutput> getSalleByNumAndBat(@PathVariable(required = true) Integer numeroSalle, @PathVariable(required = true) String batiment) throws SalleNotFoundException {
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, batiment);
+        if (salle.getNumeroSalle() != null && salle.getNumeroSalle() != 0 && salle.getBatiment() != null && !salle.getBatiment().isEmpty()) {
             getSalleByNumAndBatDTOOutput output = getSalleByNumAndBatDTOOutput.builder()
                     .nomSalle(salle.getNomSalle())
                     .numeroSalle(String.valueOf(salle.getNumeroSalle()))
@@ -88,7 +88,7 @@ public class SalleRessource {
         }
         return ResponseEntity.badRequest().body(getSalleByNumAndBatDTOOutput.builder()
                 .message("La salle n'a pas été trouvée")
-                .build();
+                .build());
     }
 
 
