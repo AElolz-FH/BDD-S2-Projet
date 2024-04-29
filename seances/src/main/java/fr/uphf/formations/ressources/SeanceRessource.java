@@ -72,6 +72,7 @@ public class SeanceRessource {
         return ResponseEntity.ok(this.seanceService.putSeanceById(id, seanceDTO));
     }
 
+    /*
     @PutMapping("/{idSalle}/{idSeance}")
     public ResponseEntity<addSalleToSeanceOutputDTO> addSalleToSeance(@PathVariable Integer idSalle, @PathVariable Integer idSeance) {
         addSalleToSeanceOutputDTO salle = this.seanceService.addSalleToSeance(idSalle, idSeance);
@@ -85,6 +86,8 @@ public class SeanceRessource {
 
         return ResponseEntity.ok(this.seanceService.addSalleToSeance(idSalle, idSeance));
     }
+
+     */
 
 
     @DeleteMapping("/{id}")

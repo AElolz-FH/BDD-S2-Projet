@@ -81,13 +81,13 @@ public class SalleService {
             return getAllSallesDTOOutput.builder().message("Aucune salle n'a été trouvée").build();
         }
         return getAllSallesDTOOutput.builder().salles(salles.stream().map(salle -> getAllSallesDTOOutput.getSallesDTOOutput.builder()
-                .id(salle.getId())
-                .numeroSalle(salle.getNumeroSalle())
-                .capacite(salle.getCapacite())
-                .nomSalle(salle.getNomSalle())
-                .batiment(salle.getBatiment())
-                .isDisponible(salle.isDisponible())
-                .build()).collect(Collectors.toList()))
+                        .id(salle.getId())
+                        .numeroSalle(salle.getNumeroSalle())
+                        .capacite(salle.getCapacite())
+                        .nomSalle(salle.getNomSalle())
+                        .batiment(salle.getBatiment())
+                        .isDisponible(salle.isDisponible())
+                        .build()).collect(Collectors.toList()))
                 .message("Les salles ont été trouvées avec succès")
                 .build();
     }
@@ -168,7 +168,7 @@ public class SalleService {
         return this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, batiment);
     }
 
-        public String deleteSalle(Integer numeroSalle, String batiment) {
+    public String deleteSalle(Integer numeroSalle, String batiment) {
         Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
         if(salle == null){
             return "La salle n'a pas été trouvée";

@@ -45,21 +45,13 @@ public class SeanceService {
     }
 
     public creationSeanceDTOOuput createSeance(creationSeanceDTOInput seanceDTO) {
-        List<Seance> seances = this.seanceRepository.findAll();
         if(seanceDTO.getDate() == null || seanceDTO.getDuree() == null){
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build();
         }
 
-        Seance seance = Seance.builder()
-                .date(seanceDTO.getDate())
-                .duree(String.valueOf(seanceDTO.getDuree()))
-                .build();
+        List<Seance> seances = this.seanceRepository.findAll();
 
-        if(seance.getDate().equals(null) || seance.getDuree().equals(null)){
-            return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, les attributs ne sont pas tous référencés").build();
-        }
-
-        if (seances.stream().anyMatch(s -> s.getDate().equals(seance.getDate()) && s.getDuree().equals(seance.getDuree()))) {
+        if (seances.stream().anyMatch(s -> s.getDate().equals(seanceDTO.getDate()) && s.getDuree().equals(String.valueOf(seanceDTO.getDuree())))) {
             return creationSeanceDTOOuput.builder().message("La séance n'a pas été créée, une séance existe déjà à cette date avec cette durée").build();
         }
 
@@ -71,13 +63,11 @@ public class SeanceService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(FormationFromAPIDTO.class)
-                .doOnSuccess(formation -> {
-                    System.out.println("Réponse API Formation réussie: " + formation);
-                })
-                .doOnError(error -> {
-                    System.out.println("Erreur lors de l'appel API: " + error.getMessage());
-                })
                 .block();
+
+        if (formationFromAPIDTO == null) {
+            return creationSeanceDTOOuput.builder().message("La formation n'a pas été trouvée").build();
+        }
 
         SalleFromAPIDTO salleFromAPIDTO = webClient.webClientBuilder()
                 .baseUrl("http://localhost:9000/salles/")
@@ -89,34 +79,38 @@ public class SeanceService {
                 .bodyToMono(SalleFromAPIDTO.class)
                 .block();
 
-        assert salleFromAPIDTO != null;
-        System.out.println("Le numéro de la salle distante est : "+salleFromAPIDTO.getNumeroSalle());
-
-        //on ajoute la salle dans le repo de salle
+        // Vérifier si la salle existe
+        if (salleFromAPIDTO == null) {
+            return creationSeanceDTOOuput.builder().message("La salle n'a pas été trouvée").build();
+        }
         Salle salleToSave = Salle.builder()
                 .numeroSalle(salleFromAPIDTO.getNumeroSalle())
                 .capacite(salleFromAPIDTO.getCapacite())
                 .batiment(salleFromAPIDTO.getBatiment())
                 .disponible(salleFromAPIDTO.isDisponible())
                 .build();
-        salleToSave.getSeance().add(seance);
-        this.salleRepository.save(salleToSave);
 
-        assert formationFromAPIDTO != null;
         Formation formationToSave = Formation.builder()
                 .libelle(formationFromAPIDTO.getLibelle())
                 .description(formationFromAPIDTO.getDescription())
                 .build();
-        formationToSave.getSeance().add(seance);
 
-        //sauvegarder en base
+        Seance seanceToSave = Seance.builder()
+                .date(seanceDTO.getDate())
+                .duree(String.valueOf(seanceDTO.getDuree()))
+                .batiment(seanceDTO.getBatiment())
+                .numeroSalle(seanceDTO.getNumeroSalle())
+                .salles(salleToSave)
+                .formation(formationToSave)
+                .build();
+
         this.salleRepository.save(salleToSave);
         this.formationRepository.save(formationToSave);
-        this.seanceRepository.save(seance);
+        this.seanceRepository.save(seanceToSave);
 
         return creationSeanceDTOOuput.builder()
-                .date(seance.getDate().toString())
-                .duree(seance.getDuree())
+                .date(seanceDTO.getDate().toString())
+                .duree(String.valueOf(seanceDTO.getDuree()))
                 .salleFromAPIDTO(SalleFromAPIDTO.builder()
                         .numeroSalle(salleFromAPIDTO.getNumeroSalle())
                         .capacite(salleFromAPIDTO.getCapacite())
@@ -125,7 +119,7 @@ public class SeanceService {
                         .build()
                 )
                 .formationFromAPIDTO(FormationFromAPIDTO.builder()
-                        .id(formationFromAPIDTO.getId())
+                        .id(formationToSave.getId())
                         .libelle(formationFromAPIDTO.getLibelle())
                         .description(formationFromAPIDTO.getDescription())
                         .message("La formation a été trouvée")
@@ -134,6 +128,7 @@ public class SeanceService {
                 .message("La séance a été créée")
                 .build();
     }
+
 
     public getSeanceByIdDTOOutput getSeanceById(Integer id) {
         Seance seance = this.seanceRepository.findById(id).orElseThrow();
@@ -161,7 +156,7 @@ public class SeanceService {
         this.seanceRepository.save(seance);
 
         return putSeanceOutputDTO.builder()
-                .id(seance.getIdSalle())
+                .id(seance.getIdSeance())
                 .date(seance.getDate().toString())
                 .duree(seance.getDuree())
                 //modif ici
@@ -177,7 +172,7 @@ public class SeanceService {
         List<getAllSeancesDTOOutput> seancesDTO = new ArrayList<>();
         for (Seance seance : seances) {
             seancesDTO.add(getAllSeancesDTOOutput.builder()
-                    .id(seance.getIdSalle())
+                    .id(seance.getIdSeance())
                     .date(seance.getDate().toString())
                     .duree(seance.getDuree())
                     .batiment(seance.getBatiment())
@@ -194,6 +189,7 @@ public class SeanceService {
         return "La séance avec l'id " + id + " a été supprimée";
     }
 
+    /*
     public addSalleToSeanceOutputDTO addSalleToSeance(Integer idSeance, Integer idSalle){
         Optional<Seance> seance = this.seanceRepository.findById(idSeance);
         if(seance.isEmpty()) {
@@ -239,6 +235,6 @@ public class SeanceService {
         this.seanceRepository.save(seanceToSave);
 
         return salle;
-    }
+    }  */
 
 }

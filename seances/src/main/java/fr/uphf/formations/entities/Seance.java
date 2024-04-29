@@ -15,13 +15,10 @@ import java.util.List;
 public class Seance {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer idSalle;
+    private Integer idSeance;
     private LocalDateTime date;
     private String duree;
     private String batiment;
-    @ElementCollection //gérer les listes d'id de manière persistantes
-    private List<Integer> idUtilisateurs;
-    private String nomSalle;
     private Integer numeroSalle;
     @ManyToOne
     private Formation formation;
