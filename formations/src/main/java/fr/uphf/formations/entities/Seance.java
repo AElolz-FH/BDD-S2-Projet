@@ -16,9 +16,8 @@ public class Seance {
     @Id
     private Integer id;
     private LocalDateTime date;
-    private LocalDateTime dateFin;
     private String duree;
-    private String batiment;
-    private String salle;
     private Integer numeroSalle;
+    private String batiment;
+    private String libelleFormation;
 }

@@ -11,8 +11,9 @@ import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
 import fr.uphf.formations.ressources.creation.dto.FormateurDTO;
 import fr.uphf.formations.ressources.getFormationByNameDTOOutput;
-import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AjoutSeanceDTOInput;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AjoutSeanceDTOOutput;
 import fr.uphf.formations.service.api.SeanceFromAPIDTO;
 import fr.uphf.formations.service.api.UtilisateurFromAPIDTO;
 import jakarta.transaction.Transactional;
@@ -206,6 +207,7 @@ public class FormationService {
     }
 
 
+    /*
     @Transactional
     public AddSeanceDTOOutput addSeance(String idFormation,String idSeance) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow();
@@ -240,7 +242,6 @@ public class FormationService {
                 .id(Integer.valueOf(idSeance))
                 .date(seanceFromAPIDTO.getDate())
                 .duree(seanceFromAPIDTO.getDuree())
-                .dateFin(seanceFromAPIDTO.getDate().plusHours(Long.parseLong(seanceFromAPIDTO.getDuree())))
                 .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
                 .batiment(seanceFromAPIDTO.getBatiment())
                 .build();
@@ -277,6 +278,88 @@ public class FormationService {
                 .nomFormation(formation.getLibelle())
                 .nomFormateur(formation.getFormateur().getNom() + " " + formation.getFormateur().getPrenom())
                 .message("La séance a été ajoutée à la formation")
+                .build();
+    }
+
+     */
+
+    @Transactional
+    public AjoutSeanceDTOOutput addSeance(AjoutSeanceDTOInput ajoutSeanceDTOInput) {
+        Formations formation = formationRepository.findByLibelle(ajoutSeanceDTOInput.getLibelleFormation());
+        Seance seance = seanceRepository.findById(ajoutSeanceDTOInput.getIdSeance()).orElse(null);
+        if (formation == null) {
+            return AjoutSeanceDTOOutput.builder()
+                    .message("La formation n'existe pas")
+                    .build();
+        }
+        List<Seance> seancesFromFormation = formation.getSeances();
+        List<Seance> seancesFromSeance = seanceRepository.findAll();
+        //récupérer une séance sur l'url : http://localhost:9000/seances/{idSeance}
+        SeanceFromAPIDTO seanceFromAPIDTO = webClient.webClientBuilder().baseUrl("http://localhost:9000/seances/")
+                .build()
+                .get()
+                .uri("/" + ajoutSeanceDTOInput.getIdSeance())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(SeanceFromAPIDTO.class)
+                .block();
+
+        Formateur formateur = formation.getFormateur();
+        if(formateur == null){System.out.println("Le formateur n'a pas été trouvé");}
+        else {System.out.println("Le formateur a été trouvé");}
+
+        if(seanceFromAPIDTO == null) {
+            return AjoutSeanceDTOOutput.builder()
+                    .message("La séance distante n'a pas été trouvée")
+                    .build();
+        }
+
+        if(seancesFromFormation == null)
+        {
+            seancesFromFormation = new ArrayList<>();
+        }
+        if(seancesFromSeance == null){
+            seancesFromSeance = new ArrayList<>();
+        }
+
+        Seance seanceToAdd = Seance.builder()
+                .id(Integer.valueOf(ajoutSeanceDTOInput.getIdSeance()))
+                .date(seanceFromAPIDTO.getDate())
+                .duree(seanceFromAPIDTO.getDuree())
+                .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
+                .batiment(seanceFromAPIDTO.getBatiment())
+                .libelleFormation(formation.getLibelle())
+                .build();
+
+        if(formateur == null)
+        {
+            return AjoutSeanceDTOOutput.builder()
+                    .message("La formation ne possède pas de formateur")
+                    .build();
+        }
+
+        this.seanceRepository.save(seanceToAdd);
+        seancesFromFormation.add(seanceToAdd);
+        seancesFromSeance.add(seanceToAdd);
+        this.formationRepository.save(formation);
+        this.seanceRepository.save(seanceToAdd);
+
+
+
+        return AjoutSeanceDTOOutput.builder()
+                .idSeance(ajoutSeanceDTOInput.getIdSeance())
+                .libelle(formation.getLibelle())
+                .duree(seanceFromAPIDTO.getDuree())
+                .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
+                .batiment(seanceFromAPIDTO.getBatiment())
+                .formateur(Formateur.builder()
+                        .idUtilisateur(formateur.getIdUtilisateur())
+                        .nom(formateur.getNom())
+                        .prenom(formateur.getPrenom())
+                        .email(formateur.getEmail())
+                        .build())
+                .date(seanceFromAPIDTO.getDate())
+                .message("La séance a été ajoutée avec succès")
                 .build();
     }
 
