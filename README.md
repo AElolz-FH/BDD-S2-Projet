@@ -15,6 +15,18 @@ Ce projet back-end est relié au projet front-end suivant : https://github.com/d
 - Lancer le Microservice Seance (SeanceApplication.java)
 - Lancer le Microservice Utilisateur (UtilisateurApplication.java)
 
+## Les différents outils déployés dans notre projet : 
+
+- WebClient : Configuré dans les micro-services pour appeler des ressources sur des API distantes.
+- Service Discovery : Eureka, référence toutes les instances de nos services.
+- Gateway : Passerelle pour accéder à nos différents services.
+- Architecture événementielle : Utilisation de RabbitMQ (pas géré partout).
+
+## Les outils qu'il reste à déployer dans notre projet : 
+
+- LoadBalancing : lors de l'ajout de l'annotation @LoadBalanced de notre webClient les requêtes distantes ne sont plus accessibles (erreur des instances ?).
+- Serveur d'autorisation : Pour l'instant, le projet ne possède pas de serveur d'autorisation.
+
 ### Ce qui fonctionne dans le projet pour le moment :
 
 - Collection postman
@@ -34,8 +46,9 @@ Ce projet back-end est relié au projet front-end suivant : https://github.com/d
    6. GET : http://localhost:9000/salles/byNum/{numeroSalle} (getByNumeroSalle)
    7. GET : http://localhost:9000/salles/numeroSalle={numeroSalle}/batiment={batiment} (getByNumeroSalleAndBatiment)
    8. DELETE : http://localhost:9000/salles/numeroSalle={numeroSalle}/batiment={batiment} (deleteByNumeroSaalleAndBatiment)
+   9. POST : http://localhost:9000/salles/seance (poster une séance associée à une salle en base)
 3. Utilisateurs :
-   1. POST :http://localhost:9000/utilisateurs/
+   1. POST : http://localhost:9000/utilisateurs/
    2. GET : http://localhost:9000/utilisateurs/ (getAll)
    3. GET : http://localhost:9000/utilisateurs/{id} (getById) (il faudrait rajouter une requête par nom prénom pour faciliter les choses dans le front)
    4. PUT : http://localhost:9000/utilisateurs/{id} (update utilisateur en tant que formateur)
@@ -49,6 +62,5 @@ Ce projet back-end est relié au projet front-end suivant : https://github.com/d
 
 ### Ce qu'il reste à faire : 
 
-- Une requête pour ajouter une séance dans une salle pour assurer plus de tolérance aux pannes dans le projet (avoir les données duppliquées dans plusieurs microservices)
-- Implémentation complète de RabbitMQ (pour l'instant on aimerait l'intégrer dans les post et les delete) -> RabbitMQ permettrait d'éviter de faire des requêtes à chaque microservice pour mettre à jour les données et de le faire automatiquement.
 - Implémentation du serveur d'authentification pour les tokens de sécurité
+- Utiliser RabbitMQ à son plein potentiel éviter de traiter les requêtes à la main (lors d'une requête on met un message dans une file, un listener écoute cette file et lors de la réception du message peut effectuer une autre requête).
