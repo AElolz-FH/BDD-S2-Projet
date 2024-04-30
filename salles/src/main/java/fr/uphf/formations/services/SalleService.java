@@ -1,5 +1,6 @@
 package fr.uphf.formations.services;
 
+import fr.uphf.formations.config.RabbitMQConfig;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
@@ -14,6 +15,7 @@ import fr.uphf.formations.entities.Salles;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
 import jakarta.ws.rs.NotFoundException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +28,9 @@ public class SalleService {
 
     @Autowired
     private SalleRepository salleRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     public SalleService(SalleRepository salleRepository) {
         this.salleRepository = salleRepository;
@@ -169,11 +174,15 @@ public class SalleService {
     }
 
     public String deleteSalle(Integer numeroSalle, String batiment) {
-        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, batiment);
         if(salle == null){
             return "La salle n'a pas été trouvée";
         }
         this.salleRepository.delete(salle);
+
+        // Publier un message RabbitMQ
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY_SALLE_DELETED, numeroSalle + "#" + batiment);
+
         return "La salle : " + salle.getNomSalle() + " a été supprimée";
     }
 

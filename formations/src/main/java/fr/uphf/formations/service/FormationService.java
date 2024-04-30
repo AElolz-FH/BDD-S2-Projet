@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static fr.uphf.formations.config.RabbitMQConfig.FORMATION_EXCHANGE_NAME;
+import static fr.uphf.formations.config.RabbitMQConfig.FORMATION_ROUTING_KEY;
+
 @Service
 public class FormationService {
     @Autowired
@@ -71,13 +74,12 @@ public class FormationService {
         List<Formations> formations = formationRepository.findByFormateur_IdUtilisateur(userId);
         for (Formations formation : formations) {
             if (formation.getFormateur() != null && formation.getFormateur().getIdUtilisateur().equals(userId)) {
-                //on supprime le formateur dans la base de données locale également
-                this.formateurRepository.delete(formation.getFormateur());
                 formation.setFormateur(null); // Supprimez le formateur de la formation
                 formationRepository.save(formation);
             }
         }
     }
+
 
 
 
@@ -366,8 +368,13 @@ public class FormationService {
     public String deleteFormation(String idFormation) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         formationRepository.delete(formation);
+
+        rabbitTemplate.convertAndSend(FORMATION_EXCHANGE_NAME, FORMATION_ROUTING_KEY, String.valueOf(formation.getId()));
+
         return "La formation a été supprimée";
     }
+
+
 
     public getFormationByNameDTOOutput getFormationByName(String nomFormation) {
         Formations formation = formationRepository.findByLibelle(nomFormation);

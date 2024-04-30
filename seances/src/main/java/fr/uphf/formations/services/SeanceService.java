@@ -1,5 +1,6 @@
 package fr.uphf.formations.services;
 
+import fr.uphf.formations.config.RabbitMQConfig;
 import fr.uphf.formations.config.WebClientConfig;
 import fr.uphf.formations.dto.addSalleToSeanceOutputDTO;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
@@ -19,6 +20,7 @@ import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.dto.ressources.SalleFromAPIDTO;
 import jakarta.ws.rs.NotFoundException;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,36 @@ public class SeanceService {
         this.webClient = webClient;
         this.salleRepository = salleRepository;
     }
+
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    public void handleFormationDeleted(String formationId) {
+        System.out.println("Received formation ID to delete: " + formationId);
+        List<Seance> seances = seanceRepository.findByFormationId(Integer.valueOf(formationId));
+        System.out.println("Found seances: " + seances.size());
+        if (!seances.isEmpty()) {
+            seanceRepository.deleteAll(seances);
+            System.out.println("Séances liées à la formation " + formationId + " ont été supprimées.");
+        } else {
+            System.out.println("Aucune séance à supprimer pour la formation " + formationId);
+        }
+    }
+
+
+    @RabbitListener(queues = RabbitMQConfig.SALLE_QUEUE_NAME)
+    public void handleSalleDeleted(String salleInfo) {
+        String[] details = salleInfo.split("#");
+        String numeroSalle = details[0];
+        String batiment = details[1];
+
+        List<Seance> seances = seanceRepository.findBySalles_NumeroSalleAndSalles_Batiment(Integer.valueOf(numeroSalle), batiment);
+        if (!seances.isEmpty()) {
+            seanceRepository.deleteAll(seances);
+            System.out.println("Séances liées à la salle numéro " + numeroSalle + " dans le bâtiment " + batiment + " ont été supprimées.");
+        } else {
+            System.out.println("Aucune séance à supprimer pour la salle et le bâtiment spécifiés.");
+        }
+    }
+
 
     public creationSeanceDTOOuput createSeance(creationSeanceDTOInput seanceDTO) {
         if(seanceDTO.getDate() == null || seanceDTO.getDuree() == null){
