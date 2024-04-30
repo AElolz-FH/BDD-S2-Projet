@@ -70,6 +70,8 @@ public class FormationService {
         List<Formations> formations = formationRepository.findByFormateur_IdUtilisateur(userId);
         for (Formations formation : formations) {
             if (formation.getFormateur() != null && formation.getFormateur().getIdUtilisateur().equals(userId)) {
+                //on supprime le formateur dans la base de données locale également
+                this.formateurRepository.delete(formation.getFormateur());
                 formation.setFormateur(null); // Supprimez le formateur de la formation
                 formationRepository.save(formation);
             }
