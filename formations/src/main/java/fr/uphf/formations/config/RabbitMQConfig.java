@@ -18,9 +18,14 @@ public class RabbitMQConfig {
     public static final String USER_QUEUE_NAME = "userQueue";
     public static final String USER_ROUTING_KEY = "user.deleted";
 
+
     public static final String FORMATION_EXCHANGE_NAME = "formationExchange";
     public static final String FORMATION_QUEUE_NAME = "formationQueue";
     public static final String FORMATION_ROUTING_KEY = "formation.deleted";
+
+    public static final String SEANCE_EXCHANGE_NAME = "seanceExchange";
+    public static final String SEANCE_QUEUE_NAME = "seanceQueue";
+    public static final String SEANCE_ROUTING_KEY = "seance.created";
 
     @Bean
     Queue userQueue() {
@@ -51,7 +56,18 @@ public class RabbitMQConfig {
     Binding formationBinding(Queue formationQueue, TopicExchange formationExchange) {
         return BindingBuilder.bind(formationQueue).to(formationExchange).with(FORMATION_ROUTING_KEY);
     }
-
+    @Bean
+    Queue seanceQueue() {
+        return new Queue(SEANCE_QUEUE_NAME, true);
+    }
+    @Bean
+    TopicExchange seanceExchange() {
+        return new TopicExchange(SEANCE_EXCHANGE_NAME);
+    }
+    @Bean
+    Binding seanceBinding(Queue seanceQueue, TopicExchange seanceExchange) {
+        return BindingBuilder.bind(seanceQueue).to(seanceExchange).with(SEANCE_ROUTING_KEY);
+    }
     @Bean
     public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);

@@ -15,6 +15,8 @@ public class RabbitMQConfig {
     public static final String EXCHANGE_NAME = "formationExchange";
     public static final String ROUTING_KEY_SALLE_DELETED = "salle.deleted";
 
+
+
     @Bean
     Queue salleQueue() {
         return new Queue(QUEUE_NAME_SALLE, true);

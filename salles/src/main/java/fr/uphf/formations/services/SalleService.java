@@ -19,6 +19,7 @@ import fr.uphf.formations.repositories.SeanceRepository;
 import jakarta.ws.rs.NotFoundException;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceInputDTO;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceOutputDTO;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -209,23 +210,21 @@ public class SalleService {
                 .message("La salle a été trouvée avec succès")
                 .build();
     }
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME_SALLE)
+    public creationSeanceOutputDTO receiveAndAddSeance(creationSeanceInputDTO creationSeanceInputDTO) {
 
-    public creationSeanceOutputDTO creerSeance(creationSeanceInputDTO creationSeanceInputDTO) {
-
-        if(creationSeanceInputDTO == null){
+        if (creationSeanceInputDTO == null) {
             return creationSeanceOutputDTO.builder()
                     .message("Le body en entrée est null")
                     .build();
         }
 
-        System.out.println("body : "+creationSeanceInputDTO);
-
-        int numeroSalle = creationSeanceInputDTO.getNumeroSalle();
-
-        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, creationSeanceInputDTO.getBatiment());
+        Salles salle = salleRepository.findByNumeroSalleAndBatiment(creationSeanceInputDTO.getNumeroSalle(), creationSeanceInputDTO.getBatiment());
 
         if (salle == null) {
-            return creationSeanceOutputDTO.builder().message("La salle n'a pas été trouvée").build();
+            return creationSeanceOutputDTO.builder()
+                    .message("La salle n'a pas été trouvée")
+                    .build();
         }
 
         Seance nouvelleSeance = Seance.builder()
@@ -236,18 +235,16 @@ public class SalleService {
                 .libelleFormation(creationSeanceInputDTO.getLibelle())
                 .build();
 
-        // Sauvegarder la séance dans la base de données des séances
-        this.seanceRepository.save(nouvelleSeance);
+        seanceRepository.save(nouvelleSeance);
 
-        // On ajoute la séance dans la liste des séances de la salle
         List<Seance> seances = salle.getSeances();
         if (seances == null) {
             seances = new ArrayList<>();
-        } else {
-            seances.add(nouvelleSeance);
         }
-        // On sauvegarde la salle pour apporter les modifications
-        this.salleRepository.save(salle);
+        seances.add(nouvelleSeance);
+
+        salle.setSeances(seances);
+        salleRepository.save(salle);
 
         Salles salleOutput = Salles.builder()
                 .id(salle.getId())
@@ -257,7 +254,6 @@ public class SalleService {
                 .capacite(salle.getCapacite())
                 .isDisponible(salle.isDisponible())
                 .build();
-
 
         return creationSeanceOutputDTO.builder()
                 .idSeance(nouvelleSeance.getIdSeance())

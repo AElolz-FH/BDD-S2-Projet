@@ -20,7 +20,10 @@ import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.dto.ressources.SalleFromAPIDTO;
 import jakarta.ws.rs.NotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
+@NoArgsConstructor
 public class SeanceService {
     @Autowired
     private SeanceRepository seanceRepository;
@@ -40,6 +45,8 @@ public class SeanceService {
     private FormationRepository formationRepository;
     @Autowired
     private WebClientConfig webClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     public SeanceService(SeanceRepository seanceRepository,WebClientConfig webClient, SalleRepository salleRepository) {
         this.seanceRepository = seanceRepository;
         this.webClient = webClient;
@@ -139,6 +146,8 @@ public class SeanceService {
         this.salleRepository.save(salleToSave);
         this.formationRepository.save(formationToSave);
         this.seanceRepository.save(seanceToSave);
+
+        this.rabbitTemplate.convertAndSend(RabbitMQConfig.SEANCE_EXCHANGE_NAME, RabbitMQConfig.SEANCE_ROUTING_KEY, seanceDTO);
 
         return creationSeanceDTOOuput.builder()
                 .date(seanceDTO.getDate().toString())
