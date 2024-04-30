@@ -16,6 +16,7 @@ import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormati
 import fr.uphf.formations.service.api.SeanceFromAPIDTO;
 import fr.uphf.formations.service.api.UtilisateurFromAPIDTO;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -35,17 +36,20 @@ public class FormationService {
     private SeanceRepository seanceRepository;
     @Autowired
     private WebClientConfig webClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     /*
     @Autowired
     private UserService userService;
 
      */
-    public FormationService(FormationRepository formationRepository, WebClientConfig webClientConfig/*UserService userService*/,FormateurRepository formateurRepository,SeanceRepository seanceRepository) {
+    public FormationService(FormationRepository formationRepository, WebClientConfig webClientConfig/*UserService userService*/,FormateurRepository formateurRepository,SeanceRepository seanceRepository, RabbitTemplate rabbitTemplate) {
         this.formationRepository = formationRepository;
         this.webClient = webClientConfig;
         //this.userService = userService;
         this.formateurRepository = formateurRepository;
         this.seanceRepository = seanceRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public List<CreateFormationInputDTO> getAllFormations() {
