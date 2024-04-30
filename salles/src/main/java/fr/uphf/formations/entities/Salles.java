@@ -19,7 +19,7 @@ public class Salles {
     private Integer capacite;
     private String nomSalle;
     private String batiment;
-    @OneToMany
+    @OneToMany(mappedBy = "salle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Seance> seances;
     private boolean isDisponible;
 }

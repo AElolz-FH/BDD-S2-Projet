@@ -1,13 +1,14 @@
 package fr.uphf.formations.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Seance {
@@ -15,8 +16,9 @@ public class Seance {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer idSeance;
     private String libelleFormation;
-    private String date;
+    private LocalDateTime date;
     private Integer numeroSalle;
+    private Integer duree;
     @ManyToOne
     private Salles salle;
     private String batiment;

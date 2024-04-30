@@ -12,14 +12,19 @@ import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modiferSalleDispoDTOInput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
 import fr.uphf.formations.entities.Salles;
+import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
+import fr.uphf.formations.repositories.SeanceRepository;
 import jakarta.ws.rs.NotFoundException;
+import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceInputDTO;
+import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceOutputDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,10 +35,14 @@ public class SalleService {
     private SalleRepository salleRepository;
 
     @Autowired
+    private SeanceRepository seanceRepository;
+
+    @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    public SalleService(SalleRepository salleRepository) {
+    public SalleService(SalleRepository salleRepository, SeanceRepository seanceRepository) {
         this.salleRepository = salleRepository;
+        this.seanceRepository = seanceRepository;
     }
 
     public creationSalleDTOOutput createSalle(creationSalleDTOInput salleDTO) {
@@ -200,4 +209,63 @@ public class SalleService {
                 .message("La salle a été trouvée avec succès")
                 .build();
     }
+
+    public creationSeanceOutputDTO creerSeance(creationSeanceInputDTO creationSeanceInputDTO) {
+
+        if(creationSeanceInputDTO == null){
+            return creationSeanceOutputDTO.builder()
+                    .message("Le body en entrée est null")
+                    .build();
+        }
+
+        System.out.println("body : "+creationSeanceInputDTO);
+
+        int numeroSalle = creationSeanceInputDTO.getNumeroSalle();
+
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, creationSeanceInputDTO.getBatiment());
+
+        if (salle == null) {
+            return creationSeanceOutputDTO.builder().message("La salle n'a pas été trouvée").build();
+        }
+
+        Seance nouvelleSeance = Seance.builder()
+                .date(creationSeanceInputDTO.getDate())
+                .salle(salle)
+                .duree(creationSeanceInputDTO.getDuree())
+                .batiment(creationSeanceInputDTO.getBatiment())
+                .libelleFormation(creationSeanceInputDTO.getLibelle())
+                .build();
+
+        // Sauvegarder la séance dans la base de données des séances
+        this.seanceRepository.save(nouvelleSeance);
+
+        // On ajoute la séance dans la liste des séances de la salle
+        List<Seance> seances = salle.getSeances();
+        if (seances == null) {
+            seances = new ArrayList<>();
+        } else {
+            seances.add(nouvelleSeance);
+        }
+        // On sauvegarde la salle pour apporter les modifications
+        this.salleRepository.save(salle);
+
+        Salles salleOutput = Salles.builder()
+                .id(salle.getId())
+                .nomSalle(salle.getNomSalle())
+                .numeroSalle(salle.getNumeroSalle())
+                .batiment(salle.getBatiment())
+                .capacite(salle.getCapacite())
+                .isDisponible(salle.isDisponible())
+                .build();
+
+
+        return creationSeanceOutputDTO.builder()
+                .idSeance(nouvelleSeance.getIdSeance())
+                .duree(nouvelleSeance.getDuree())
+                .date(nouvelleSeance.getDate())
+                .salles(salleOutput)
+                .message("La séance a été créée avec succès")
+                .build();
+    }
 }
+
