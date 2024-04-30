@@ -25,7 +25,6 @@ public class SeanceRessource {
         this.seanceService = seanceService;
     }
 
-
     @PostMapping("/")
     public ResponseEntity<creationSeanceDTOOuput> creerSeance(@RequestBody creationSeanceDTOInput seanceDTO) {
         creationSeanceDTOOuput seance = this.seanceService.createSeance(seanceDTO);

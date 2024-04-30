@@ -20,5 +20,4 @@ public class Formation {
     @OneToMany(mappedBy = "formation")
     private List<Seance> seance;
     private String message;
-
 }

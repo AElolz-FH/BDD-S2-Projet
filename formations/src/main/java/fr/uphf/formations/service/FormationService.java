@@ -61,7 +61,7 @@ public class FormationService {
     }
 
     //Utilisation de RabbitMQ pour supprimer un formateur d'une formation lorsqu'un utilisateur est supprimé
-    /*@RabbitListener(queues = "formationQueue")
+    @RabbitListener(queues = "formationQueue")
     public void onUserDeleted(Integer userId) {
         List<Formations> formations = formationRepository.findByFormateur_IdUtilisateur(userId);
         for (Formations formation : formations) {
@@ -70,7 +70,8 @@ public class FormationService {
                 formationRepository.save(formation);
             }
         }
-    }*/
+    }
+
 
 
     public CreateFormationResponseDTO createFormation(CreateFormationInputDTO createFormationInputDTO) {

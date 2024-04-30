@@ -162,6 +162,7 @@ public class SeanceService {
                 //modif ici
                 .batiment(seance.getBatiment())
                 .numeroSalle(seance.getNumeroSalle())
+                .nomFormation(seance.getFormation() != null ? seance.getFormation().getLibelle() : null)
                 .message("La séance a été modifiée")
                 .build();
 
@@ -177,11 +178,13 @@ public class SeanceService {
                     .duree(seance.getDuree())
                     .batiment(seance.getBatiment())
                     .numeroSalle(seance.getNumeroSalle())
-                    //modif ici
+                    .nomFormation(seance.getFormation() != null ? seance.getFormation().getLibelle() : null)
+                    .message("La séance a été trouvée")
                     .build());
         }
         return seancesDTO;
     }
+
 
     public String deleteSeanceById(Integer id) {
         Seance seance = this.seanceRepository.findById(id).orElseThrow( () -> new NotFoundException("La séance avec l'id " + id + " n'existe pas"));

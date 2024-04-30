@@ -1,5 +1,6 @@
 package fr.uphf.formations.entities;
 
+import fr.uphf.formations.dto.ressources.FormateurPayload;
 import jakarta.persistence.*;
 import lombok.*;
 
