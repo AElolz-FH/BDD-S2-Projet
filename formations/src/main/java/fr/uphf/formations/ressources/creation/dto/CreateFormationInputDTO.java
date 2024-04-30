@@ -11,7 +11,6 @@ public class CreateFormationInputDTO {
     private Integer id;
     private String libelle;
     private String description;
-    private double prix;
     private FormateurDTO formateur;
 }
 

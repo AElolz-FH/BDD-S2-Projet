@@ -90,7 +90,6 @@ public class FormationService {
         Formations formation = Formations.builder()
                 .libelle(createFormationInputDTO.getLibelle())
                 .description(createFormationInputDTO.getDescription())
-                .prix((int) createFormationInputDTO.getPrix())
                 .formateur(null)
                 .participants(null)
                 .build();
@@ -117,7 +116,6 @@ public class FormationService {
                 .id(savedFormation.getId())
                 .libelle(savedFormation.getLibelle())
                 .description(savedFormation.getDescription())
-                .prix(savedFormation.getPrix())
                 .message("La formation a été créée")
                 .build();
     }
@@ -128,7 +126,6 @@ public class FormationService {
                 .id(formation.getId())
                 .libelle(formation.getLibelle())
                 .description(formation.getDescription())
-                .prix(formation.getPrix())
                 .build();
     }
 
@@ -148,7 +145,6 @@ public class FormationService {
                 .id(formationEntity.getId())
                 .libelle(formationEntity.getLibelle())
                 .description(formationEntity.getDescription())
-                .prix(formationEntity.getPrix())
                 .formateur(formateurDTO) // Ajouter le formateur au DTO
                 .build();
     }

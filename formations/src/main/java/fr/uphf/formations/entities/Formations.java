@@ -23,5 +23,4 @@ public class Formations {
     private List<Participant> participants;
     @OneToMany
     private List<Seance> seances;
-    private Integer prix;
 }
