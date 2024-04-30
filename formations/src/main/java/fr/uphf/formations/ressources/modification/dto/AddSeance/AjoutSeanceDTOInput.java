@@ -13,7 +13,6 @@ public class AjoutSeanceDTOInput {
     private String idSeance;
     private String libelleFormation;
     private LocalDateTime date;
-    private Integer duree;
     private Integer numeroSalle;
     private String batiment;
 }
