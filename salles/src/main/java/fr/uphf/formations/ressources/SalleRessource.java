@@ -53,7 +53,7 @@ public class SalleRessource {
 
     @PostMapping("/seance")
     public ResponseEntity<creationSeanceOutputDTO> creerSeanceInSalle(@RequestBody creationSeanceInputDTO creationSeanceInputDTO){
-        creationSeanceOutputDTO creationSeanceOutputDTO = this.salleService.creerSeance(creationSeanceInputDTO);
+        creationSeanceOutputDTO creationSeanceOutputDTO = this.salleService.receiveAndAddSeance(creationSeanceInputDTO);
         if(creationSeanceOutputDTO.getMessage().equals("La salle n'a pas été trouvée")){
             System.out.println("La salle n'a pas été trouvée");
             return ResponseEntity.badRequest().body(creationSeanceOutputDTO.builder().message("La salle n'a pas été trouvée").build());
