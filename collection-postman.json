@@ -1,0 +1,663 @@
+{
+	"info": {
+		"_postman_id": "224f9bf1-1fa4-437d-8bd9-fd9039ce6241",
+		"name": "TP-Semestre-8",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31156598"
+	},
+	"item": [
+		{
+			"name": "Formations",
+			"item": [
+				{
+					"name": "POST Formation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"libelle\": \"Formation sur php\",\n  \"description\": \"Cette formation couvre les concepts avancés de php\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/formations/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"formations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GETALL Formation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/formations/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"formations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET BY NomFormation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/formations/search/Formation%20sur%20php",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"formations",
+								"search",
+								"Formation%20sur%20php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Formation",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/formations/users/1/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"formations",
+								"users",
+								"1",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Formation <- Seance",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"idSeance\":1,\n    \"libelleFormation\":\"Formation sur php\",\n    \"numeroSalle\":102,\n    \"batiment\":\"test2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/formations/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"formations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE{id}",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/formations/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"formations",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Salles",
+			"item": [
+				{
+					"name": "POST Salles",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroSalle\": 102,\n  \"capacite\": 50,\n  \"nomSalle\": \"Salle de conférence A\",\n  \"batiment\": \"test2\",\n  \"disponible\": true\n}\n\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/salles/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GETID Salles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/salles/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GETALL Salles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/salles/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ModifierSalle",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"numeroSalle\":102,\n    \"nomSalle\": \"Salle de réunion\",\n    \"batiment\": \"nouveau\",\n    \"capacite\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/salles/102",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"102"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ModifierDispoSalle",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"disponible\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/salles/dispo=101",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"dispo=101"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ByNumeroSalle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/salles/byNum/101",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"byNum",
+								"101"
+							],
+							"query": [
+								{
+									"key": "numeroSalle",
+									"value": "101",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getByNumAndBat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/salles/numeroSalle=102/batiment=test2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"numeroSalle=102",
+								"batiment=test2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ByNumAndBat",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/salles/numeroSalle=101/batiment=Batiment%20principal",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"numeroSalle=101",
+								"batiment=Batiment%20principal"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PostSeanceInSalle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"numeroSalle\":102,\n    \"batiment\":\"test2\",\n    \"libelle\":\"Formation sur php\",\n    \"duree\":1,\n    \"date\":\"2024-03-25T10:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/salles/seance",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"salles",
+								"seance"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Utilisateurs",
+			"item": [
+				{
+					"name": "Utilisateurs",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":\"1\",\n    \"nom\":\"Dupont\",\n    \"prenom\":\"Jean\",\n    \"email\":\"JeanDubois@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/utilisateurs/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"utilisateurs",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All/Utilisateurs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/utilisateurs/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"utilisateurs",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Utilisateurs/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/utilisateurs/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"utilisateurs",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "isFormateur",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":1,\n    \"nom\":\"Jean\",\n    \"prenom\":\"Dupont\",\n    \"formateur\":true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/utilisateurs/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"utilisateurs",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "del-Nom-Prenom",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/utilisateurs/nom=Dupont&prenom=Jean",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"utilisateurs",
+								"nom=Dupont&prenom=Jean"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seances",
+			"item": [
+				{
+					"name": "Post Seance",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroSalle\": 102,\n  \"libelle\": \"Formation sur php\",\n  \"batiment\": \"test2\",\n  \"date\": \"2024-03-25T10:00\",\n  \"duree\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/seances/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"seances",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get seance/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/seances/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"seances",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Put Seance",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2024-03-28T10:00:00\",\n  \"duree\": \"3 heures\",\n  \"batiment\": \"Bâtiment B\",\n  \"numeroSalle\": 102\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/seances/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"seances",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddSalleToSeance",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/seances/1/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"seances",
+								"1",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GETALL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/seances/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"seances",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteByID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/seances/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"seances",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
