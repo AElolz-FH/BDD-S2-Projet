@@ -6,15 +6,13 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AddSeanceDTOInput {
-    private Integer idSeance;
+@AllArgsConstructor
+@Builder
+public class AjoutSeanceDTOInput {
+    private String idSeance;
+    private String libelleFormation;
     private LocalDateTime date;
-    private LocalDateTime dateFin;
-    private String duree;
-    private String batiment;
-    private String salle;
     private Integer numeroSalle;
+    private String batiment;
 }

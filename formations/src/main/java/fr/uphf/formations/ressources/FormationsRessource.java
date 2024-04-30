@@ -1,12 +1,11 @@
 package fr.uphf.formations.ressources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.uphf.formations.repository.FormateurRepository;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationInputDTO;
 import fr.uphf.formations.ressources.creation.dto.CreateFormationResponseDTO;
-import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
-import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationInputDTO;
 import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AjoutSeanceDTOInput;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AjoutSeanceDTOOutput;
 import fr.uphf.formations.service.FormationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,6 +55,7 @@ public class FormationsRessource {
     }
 
 
+    /*
     @PutMapping("/{idFormation}/{idSeance}")
     public ResponseEntity<AddSeanceDTOOutput> addSeanceToFormation(@PathVariable String idFormation, @PathVariable String idSeance) {
         AddSeanceDTOOutput addSeanceDTOOutput = this.formationService.addSeance(idFormation, idSeance);
@@ -70,6 +70,19 @@ public class FormationsRessource {
             return ResponseEntity.internalServerError().body(AddSeanceDTOOutput.builder().message(addSeanceDTOOutput.getMessage()).build());
         }
         return ResponseEntity.ok(addSeanceDTOOutput);
+    }
+
+     */
+
+    @PutMapping("")
+    public ResponseEntity<AjoutSeanceDTOOutput> addSeance(@RequestBody AjoutSeanceDTOInput ajoutSeanceDTOInput)
+    {
+        AjoutSeanceDTOOutput ajoutSeanceDTOOutput = this.formationService.addSeance(ajoutSeanceDTOInput);
+        System.out.println("Requête reçue pour ajouter une séance à une formation");
+        if(ajoutSeanceDTOOutput.getMessage().equals("La séance distante n'a pas été trouvée")){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(AjoutSeanceDTOOutput.builder().message(ajoutSeanceDTOOutput.getMessage()).build());
+        }
+        return ResponseEntity.ok(ajoutSeanceDTOOutput);
     }
 
     @GetMapping("/search/{nomFormation}")

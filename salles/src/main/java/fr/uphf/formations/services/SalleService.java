@@ -1,5 +1,6 @@
 package fr.uphf.formations.services;
 
+import fr.uphf.formations.config.RabbitMQConfig;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
@@ -11,13 +12,20 @@ import fr.uphf.formations.dto.modifierSalleDTO.modifierSalleDTOOutput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modiferSalleDispoDTOInput;
 import fr.uphf.formations.dto.modifierSalleDispoDTO.modifierSalleDispoDTOOutput;
 import fr.uphf.formations.entities.Salles;
+import fr.uphf.formations.entities.Seance;
 import fr.uphf.formations.exceptions.SalleNotFoundException;
 import fr.uphf.formations.repositories.SalleRepository;
+import fr.uphf.formations.repositories.SeanceRepository;
 import jakarta.ws.rs.NotFoundException;
+import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceInputDTO;
+import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceOutputDTO;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +35,15 @@ public class SalleService {
     @Autowired
     private SalleRepository salleRepository;
 
-    public SalleService(SalleRepository salleRepository) {
+    @Autowired
+    private SeanceRepository seanceRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public SalleService(SalleRepository salleRepository, SeanceRepository seanceRepository) {
         this.salleRepository = salleRepository;
+        this.seanceRepository = seanceRepository;
     }
 
     public creationSalleDTOOutput createSalle(creationSalleDTOInput salleDTO) {
@@ -169,11 +184,15 @@ public class SalleService {
     }
 
     public String deleteSalle(Integer numeroSalle, String batiment) {
-        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle,batiment);
+        Salles salle = this.salleRepository.findByNumeroSalleAndBatiment(numeroSalle, batiment);
         if(salle == null){
             return "La salle n'a pas été trouvée";
         }
         this.salleRepository.delete(salle);
+
+        // Publier un message RabbitMQ
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY_SALLE_DELETED, numeroSalle + "#" + batiment);
+
         return "La salle : " + salle.getNomSalle() + " a été supprimée";
     }
 
@@ -191,4 +210,58 @@ public class SalleService {
                 .message("La salle a été trouvée avec succès")
                 .build();
     }
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME_SALLE)
+    public creationSeanceOutputDTO receiveAndAddSeance(creationSeanceInputDTO creationSeanceInputDTO) {
+
+        if (creationSeanceInputDTO == null) {
+            return creationSeanceOutputDTO.builder()
+                    .message("Le body en entrée est null")
+                    .build();
+        }
+
+        Salles salle = salleRepository.findByNumeroSalleAndBatiment(creationSeanceInputDTO.getNumeroSalle(), creationSeanceInputDTO.getBatiment());
+
+        if (salle == null) {
+            return creationSeanceOutputDTO.builder()
+                    .message("La salle n'a pas été trouvée")
+                    .build();
+        }
+
+        Seance nouvelleSeance = Seance.builder()
+                .date(creationSeanceInputDTO.getDate())
+                .salle(salle)
+                .duree(creationSeanceInputDTO.getDuree())
+                .batiment(creationSeanceInputDTO.getBatiment())
+                .libelleFormation(creationSeanceInputDTO.getLibelle())
+                .build();
+
+        seanceRepository.save(nouvelleSeance);
+
+        List<Seance> seances = salle.getSeances();
+        if (seances == null) {
+            seances = new ArrayList<>();
+        }
+        seances.add(nouvelleSeance);
+
+        salle.setSeances(seances);
+        salleRepository.save(salle);
+
+        Salles salleOutput = Salles.builder()
+                .id(salle.getId())
+                .nomSalle(salle.getNomSalle())
+                .numeroSalle(salle.getNumeroSalle())
+                .batiment(salle.getBatiment())
+                .capacite(salle.getCapacite())
+                .isDisponible(salle.isDisponible())
+                .build();
+
+        return creationSeanceOutputDTO.builder()
+                .idSeance(nouvelleSeance.getIdSeance())
+                .duree(nouvelleSeance.getDuree())
+                .date(nouvelleSeance.getDate())
+                .salles(salleOutput)
+                .message("La séance a été créée avec succès")
+                .build();
+    }
 }
+

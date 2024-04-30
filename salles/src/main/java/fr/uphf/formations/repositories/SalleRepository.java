@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface SalleRepository extends JpaRepository<Salles, Integer> {
     public Salles findByNumeroSalle(Integer numeroSalle);
-    //@Query("SELECT * FROM SALLES WHERE NUMERO_SALLE = :numeroSalle and BATIMENT = 'test2'")
+    //@Query("SELECT s FROM SALLES WHERE NUMERO_SALLE = :numeroSalle and BATIMENT = 'test2'")
     public Salles findByNumeroSalleAndBatiment(Integer numeroSalle, String batiment);
 }

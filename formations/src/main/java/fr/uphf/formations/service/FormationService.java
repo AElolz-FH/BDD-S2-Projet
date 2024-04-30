@@ -11,11 +11,13 @@ import fr.uphf.formations.entities.Formations;
 import fr.uphf.formations.repository.FormationRepository;
 import fr.uphf.formations.ressources.creation.dto.FormateurDTO;
 import fr.uphf.formations.ressources.getFormationByNameDTOOutput;
-import fr.uphf.formations.ressources.modification.dto.AddSeance.AddSeanceDTOOutput;
 import fr.uphf.formations.ressources.modification.dto.AddFormateur.ModifyFormationOutputDTO;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AjoutSeanceDTOInput;
+import fr.uphf.formations.ressources.modification.dto.AddSeance.AjoutSeanceDTOOutput;
 import fr.uphf.formations.service.api.SeanceFromAPIDTO;
 import fr.uphf.formations.service.api.UtilisateurFromAPIDTO;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static fr.uphf.formations.config.RabbitMQConfig.FORMATION_EXCHANGE_NAME;
+import static fr.uphf.formations.config.RabbitMQConfig.FORMATION_ROUTING_KEY;
 
 @Service
 public class FormationService {
@@ -35,17 +40,20 @@ public class FormationService {
     private SeanceRepository seanceRepository;
     @Autowired
     private WebClientConfig webClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     /*
     @Autowired
     private UserService userService;
 
      */
-    public FormationService(FormationRepository formationRepository, WebClientConfig webClientConfig/*UserService userService*/,FormateurRepository formateurRepository,SeanceRepository seanceRepository) {
+    public FormationService(FormationRepository formationRepository, WebClientConfig webClientConfig/*UserService userService*/,FormateurRepository formateurRepository,SeanceRepository seanceRepository, RabbitTemplate rabbitTemplate) {
         this.formationRepository = formationRepository;
         this.webClient = webClientConfig;
         //this.userService = userService;
         this.formateurRepository = formateurRepository;
         this.seanceRepository = seanceRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public List<CreateFormationInputDTO> getAllFormations() {
@@ -74,6 +82,7 @@ public class FormationService {
 
 
 
+
     public CreateFormationResponseDTO createFormation(CreateFormationInputDTO createFormationInputDTO) {
 
         List<Formations> formations = this.formationRepository.findAll();
@@ -81,7 +90,6 @@ public class FormationService {
         Formations formation = Formations.builder()
                 .libelle(createFormationInputDTO.getLibelle())
                 .description(createFormationInputDTO.getDescription())
-                .prix((int) createFormationInputDTO.getPrix())
                 .formateur(null)
                 .participants(null)
                 .build();
@@ -108,7 +116,6 @@ public class FormationService {
                 .id(savedFormation.getId())
                 .libelle(savedFormation.getLibelle())
                 .description(savedFormation.getDescription())
-                .prix(savedFormation.getPrix())
                 .message("La formation a été créée")
                 .build();
     }
@@ -119,7 +126,6 @@ public class FormationService {
                 .id(formation.getId())
                 .libelle(formation.getLibelle())
                 .description(formation.getDescription())
-                .prix(formation.getPrix())
                 .build();
     }
 
@@ -139,7 +145,6 @@ public class FormationService {
                 .id(formationEntity.getId())
                 .libelle(formationEntity.getLibelle())
                 .description(formationEntity.getDescription())
-                .prix(formationEntity.getPrix())
                 .formateur(formateurDTO) // Ajouter le formateur au DTO
                 .build();
     }
@@ -200,6 +205,7 @@ public class FormationService {
     }
 
 
+    /*
     @Transactional
     public AddSeanceDTOOutput addSeance(String idFormation,String idSeance) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow();
@@ -234,7 +240,6 @@ public class FormationService {
                 .id(Integer.valueOf(idSeance))
                 .date(seanceFromAPIDTO.getDate())
                 .duree(seanceFromAPIDTO.getDuree())
-                .dateFin(seanceFromAPIDTO.getDate().plusHours(Long.parseLong(seanceFromAPIDTO.getDuree())))
                 .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
                 .batiment(seanceFromAPIDTO.getBatiment())
                 .build();
@@ -274,11 +279,98 @@ public class FormationService {
                 .build();
     }
 
+     */
+
+    @Transactional
+    public AjoutSeanceDTOOutput addSeance(AjoutSeanceDTOInput ajoutSeanceDTOInput) {
+        Formations formation = formationRepository.findByLibelle(ajoutSeanceDTOInput.getLibelleFormation());
+        Seance seance = seanceRepository.findById(ajoutSeanceDTOInput.getIdSeance()).orElse(null);
+        if (formation == null) {
+            return AjoutSeanceDTOOutput.builder()
+                    .message("La formation n'existe pas")
+                    .build();
+        }
+        List<Seance> seancesFromFormation = formation.getSeances();
+        List<Seance> seancesFromSeance = seanceRepository.findAll();
+        //récupérer une séance sur l'url : http://localhost:9000/seances/{idSeance}
+        SeanceFromAPIDTO seanceFromAPIDTO = webClient.webClientBuilder().baseUrl("http://localhost:9000/seances/")
+                .build()
+                .get()
+                .uri("/" + ajoutSeanceDTOInput.getIdSeance())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(SeanceFromAPIDTO.class)
+                .block();
+
+        Formateur formateur = formation.getFormateur();
+        if(formateur == null){System.out.println("Le formateur n'a pas été trouvé");}
+        else {System.out.println("Le formateur a été trouvé");}
+
+        if(seanceFromAPIDTO == null) {
+            return AjoutSeanceDTOOutput.builder()
+                    .message("La séance distante n'a pas été trouvée")
+                    .build();
+        }
+
+        if(seancesFromFormation == null)
+        {
+            seancesFromFormation = new ArrayList<>();
+        }
+        if(seancesFromSeance == null){
+            seancesFromSeance = new ArrayList<>();
+        }
+
+        Seance seanceToAdd = Seance.builder()
+                .id(Integer.valueOf(ajoutSeanceDTOInput.getIdSeance()))
+                .date(seanceFromAPIDTO.getDate())
+                .duree(seanceFromAPIDTO.getDuree())
+                .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
+                .batiment(seanceFromAPIDTO.getBatiment())
+                .libelleFormation(formation.getLibelle())
+                .build();
+
+        if(formateur == null)
+        {
+            return AjoutSeanceDTOOutput.builder()
+                    .message("La formation ne possède pas de formateur")
+                    .build();
+        }
+
+        this.seanceRepository.save(seanceToAdd);
+        seancesFromFormation.add(seanceToAdd);
+        seancesFromSeance.add(seanceToAdd);
+        this.formationRepository.save(formation);
+        this.seanceRepository.save(seanceToAdd);
+
+
+
+        return AjoutSeanceDTOOutput.builder()
+                .idSeance(ajoutSeanceDTOInput.getIdSeance())
+                .libelle(formation.getLibelle())
+                .duree(seanceFromAPIDTO.getDuree())
+                .numeroSalle(seanceFromAPIDTO.getNumeroSalle())
+                .batiment(seanceFromAPIDTO.getBatiment())
+                .formateur(Formateur.builder()
+                        .idUtilisateur(formateur.getIdUtilisateur())
+                        .nom(formateur.getNom())
+                        .prenom(formateur.getPrenom())
+                        .email(formateur.getEmail())
+                        .build())
+                .date(seanceFromAPIDTO.getDate())
+                .message("La séance a été ajoutée avec succès")
+                .build();
+    }
+
     public String deleteFormation(String idFormation) {
         Formations formation = formationRepository.findById(idFormation).orElseThrow(() -> new RuntimeException("Formation non trouvée"));
         formationRepository.delete(formation);
+
+        rabbitTemplate.convertAndSend(FORMATION_EXCHANGE_NAME, FORMATION_ROUTING_KEY, String.valueOf(formation.getId()));
+
         return "La formation a été supprimée";
     }
+
+
 
     public getFormationByNameDTOOutput getFormationByName(String nomFormation) {
         Formations formation = formationRepository.findByLibelle(nomFormation);

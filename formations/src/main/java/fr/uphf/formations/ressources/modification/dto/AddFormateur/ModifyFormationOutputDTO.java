@@ -13,7 +13,6 @@ import java.util.List;
 public class ModifyFormationOutputDTO {
     private String libelle;
     private String description;
-    private double prix;
     private ModifyFormateurPayload formateur;
     private List<ModifySeancePayload> seances;
     private String message;

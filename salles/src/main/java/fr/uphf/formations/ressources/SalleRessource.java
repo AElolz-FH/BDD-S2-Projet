@@ -2,6 +2,8 @@ package fr.uphf.formations.ressources;
 
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOInput;
 import fr.uphf.formations.dto.creationSalleDTO.creationSalleDTOOutput;
+import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceInputDTO;
+import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceOutputDTO;
 import fr.uphf.formations.dto.getAllSallesDTO.getAllSallesDTOOutput;
 import fr.uphf.formations.dto.getSalleByNumAndBatDTO.getSalleByNumAndBatDTOOutput;
 import fr.uphf.formations.dto.getSalleByNumeroDTO.getSalleByNumeroDTOOutput;
@@ -47,6 +49,25 @@ public class SalleRessource {
         }
         System.out.println("Requête reçue pour créer une salle");
         return ResponseEntity.ok(createSalleResponseDTO);
+    }
+
+    @PostMapping("/seance")
+    public ResponseEntity<creationSeanceOutputDTO> creerSeanceInSalle(@RequestBody creationSeanceInputDTO creationSeanceInputDTO){
+        creationSeanceOutputDTO creationSeanceOutputDTO = this.salleService.receiveAndAddSeance(creationSeanceInputDTO);
+        if(creationSeanceOutputDTO.getMessage().equals("La salle n'a pas été trouvée")){
+            System.out.println("La salle n'a pas été trouvée");
+            return ResponseEntity.badRequest().body(creationSeanceOutputDTO.builder().message("La salle n'a pas été trouvée").build());
+        }
+        if(creationSeanceOutputDTO.getMessage().equals("La salle n'est pas disponible")){
+            System.out.println("La salle n'est pas disponible");
+            return ResponseEntity.badRequest().body(creationSeanceOutputDTO.builder().message("La salle n'est pas disponible").build());
+        }
+        if(creationSeanceOutputDTO.getMessage().equals("La salle n'a pas été trouvée")){
+            System.out.println("La salle n'a pas été trouvée");
+            return ResponseEntity.badRequest().body(creationSeanceOutputDTO.builder().message("La salle n'a pas été trouvée").build());
+        }
+        System.out.println("Requête reçue pour créer une séance dans une salle");
+        return ResponseEntity.ok(creationSeanceOutputDTO);
     }
 
     @GetMapping("/{id}")

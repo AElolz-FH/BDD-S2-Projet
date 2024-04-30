@@ -1,5 +1,6 @@
 package fr.uphf.formations.services;
 
+import fr.uphf.formations.config.RabbitMQConfig;
 import fr.uphf.formations.config.WebClientConfig;
 import fr.uphf.formations.dto.addSalleToSeanceOutputDTO;
 import fr.uphf.formations.dto.creationSeanceDTO.creationSeanceDTOInput;
@@ -19,6 +20,10 @@ import fr.uphf.formations.repositories.SalleRepository;
 import fr.uphf.formations.repositories.SeanceRepository;
 import fr.uphf.formations.dto.ressources.SalleFromAPIDTO;
 import jakarta.ws.rs.NotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
+@NoArgsConstructor
 public class SeanceService {
     @Autowired
     private SeanceRepository seanceRepository;
@@ -38,11 +45,43 @@ public class SeanceService {
     private FormationRepository formationRepository;
     @Autowired
     private WebClientConfig webClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     public SeanceService(SeanceRepository seanceRepository,WebClientConfig webClient, SalleRepository salleRepository) {
         this.seanceRepository = seanceRepository;
         this.webClient = webClient;
         this.salleRepository = salleRepository;
     }
+
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    public void handleFormationDeleted(String formationId) {
+        System.out.println("Received formation ID to delete: " + formationId);
+        List<Seance> seances = seanceRepository.findByFormationId(Integer.valueOf(formationId));
+        System.out.println("Found seances: " + seances.size());
+        if (!seances.isEmpty()) {
+            seanceRepository.deleteAll(seances);
+            System.out.println("Séances liées à la formation " + formationId + " ont été supprimées.");
+        } else {
+            System.out.println("Aucune séance à supprimer pour la formation " + formationId);
+        }
+    }
+
+
+    @RabbitListener(queues = RabbitMQConfig.SALLE_QUEUE_NAME)
+    public void handleSalleDeleted(String salleInfo) {
+        String[] details = salleInfo.split("#");
+        String numeroSalle = details[0];
+        String batiment = details[1];
+
+        List<Seance> seances = seanceRepository.findBySalles_NumeroSalleAndSalles_Batiment(Integer.valueOf(numeroSalle), batiment);
+        if (!seances.isEmpty()) {
+            seanceRepository.deleteAll(seances);
+            System.out.println("Séances liées à la salle numéro " + numeroSalle + " dans le bâtiment " + batiment + " ont été supprimées.");
+        } else {
+            System.out.println("Aucune séance à supprimer pour la salle et le bâtiment spécifiés.");
+        }
+    }
+
 
     public creationSeanceDTOOuput createSeance(creationSeanceDTOInput seanceDTO) {
         if(seanceDTO.getDate() == null || seanceDTO.getDuree() == null){
@@ -107,6 +146,8 @@ public class SeanceService {
         this.salleRepository.save(salleToSave);
         this.formationRepository.save(formationToSave);
         this.seanceRepository.save(seanceToSave);
+
+        this.rabbitTemplate.convertAndSend(RabbitMQConfig.SEANCE_EXCHANGE_NAME, RabbitMQConfig.SEANCE_ROUTING_KEY, seanceDTO);
 
         return creationSeanceDTOOuput.builder()
                 .date(seanceDTO.getDate().toString())

@@ -14,5 +14,4 @@ public class FormationDTOResponse {
     private String description;
     private Integer idFormateur;
     private String dateCreation;
-    private double prix;
 }
