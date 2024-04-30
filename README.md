@@ -62,5 +62,5 @@ Ce projet back-end est relié au projet front-end suivant : https://github.com/d
 
 ### Ce qu'il reste à faire : 
 
-- Implémentation du serveur d'authentification pour les tokens de sécurité
+- Implémentation du serveur d'authentification pour les tokens de sécurité (en cours)
 - Utiliser RabbitMQ à son plein potentiel éviter de traiter les requêtes à la main (lors d'une requête on met un message dans une file, un listener écoute cette file et lors de la réception du message peut effectuer une autre requête).
